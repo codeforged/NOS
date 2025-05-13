@@ -1,0 +1,69 @@
+[
+  {
+    "device": "comm",
+    "active": false,
+    "rules": [
+      {
+        "direction": "incoming",
+        "type": "allow",
+        "condition": {
+          "dstAddress": "*",
+          "dstPort": "*",
+          "srcAddress": "*",
+          "srcPort": "*"
+        },
+        "active": 1
+      },
+      {
+        "direction": "outgoing",
+        "type": "allow",
+        "condition": {
+          "dstAddress": "*",
+          "dstPort": "*",
+          "srcAddress": "*",
+          "srcPort": "*"
+        },
+        "active": 1
+      },
+      {
+        "direction": "incoming",
+        "type": "allow",
+        "active": 1,
+        "condition": {
+          "srcAddress": "*",
+          "srcPort": "*",
+          "dstAddress": "*",
+          "dstPort": "*"
+        }
+      }
+    ]
+  },
+  {
+    "device": "comm1",
+    "active": false,
+    "rules": [
+      {
+        "direction": "incoming",
+        "type": "allow",
+        "condition": {
+          "dstAddress": "*",
+          "dstPort": "*",
+          "srcAddress": "*",
+          "srcPort": "*"
+        },
+        "active": 1
+      },
+      {
+        "direction": "outgoing",
+        "type": "allow",
+        "condition": {
+          "dstAddress": "*",
+          "dstPort": "*",
+          "srcAddress": "*",
+          "srcPort": "*"
+        },
+        "active": 1
+      }
+    ]
+  }
+]

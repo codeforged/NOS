@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="main.js"></script>
+    <style>
+      @font-face {
+        font-family: "oswald";
+        src: url("../js/PressStart2P-vaV7.ttf");
+      }
+    </style>
+  </head>
+  <body></body>
+  <script>
+    function injectKonamiMode() {
+      if (document.getElementById("konami-modal")) return;
+
+      const pic = [
+        "tumblr_n594zqluJ31rpfk7eo1_500.gif",
+        "e17ab9681bec36303a67cd0e13a7b170.gif",
+        "giphy.gif",
+        "222829.gif",
+        "tumblr_nmvrs6ubl71qze3hdo1_r1_500.gif",
+      ];
+      let current = 0;
+
+      const div = document.createElement("div");
+      div.id = "konami-modal";
+
+      div.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;
+          background:black;display:flex;flex-direction:column;align-items:center;
+          justify-content:center;z-index:9999;">
+
+          <img id="konami-img" src="../../images/${pic[0]}" style="width:60%;height:auto;" alt="8-bit picture"/>
+
+          <h2 style="color:lime;font-family:oswald;margin:20px 0;font-size:15pt">
+            YOU UNLOCKED: 8-BIT HERO MODE!
+          </h2>
+
+          <button onclick="document.getElementById('konami-modal').remove(); clearInterval(imgChanger);"
+            style="font-family:oswald;font-size:12pt;padding:10px 20px;background:#ff0;border:3px dashed red;font-weight:bold;">
+            GAME OVER! 🎮
+          </button>
+
+          <audio autoplay loop>
+            <source src="8-bit-heaven-26287.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+      `;
+
+      document.body.appendChild(div);
+
+      // Ganti gambar tiap 5 detik
+      if (typeof imgChanger8bit != "undefined") clearInterval(imgChanger8bit);
+      window.imgChanger8bit = setInterval(() => {
+        current = (current + 1) % pic.length;
+        const img = document.getElementById("konami-img");
+        if (img) img.src = `../../images/${pic[current]}`;
+      }, 5000);
+    }
+
+    setTimeout(() => {
+      injectKonamiMode();
+    }, 100);
+  </script>
+</html>

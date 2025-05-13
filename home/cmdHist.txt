@@ -1,0 +1,18 @@
+fwset --load -d comm
+fwset --load -d comm1
+ftd -p 405
+airtermd -s /base/microShell
+pkgd -p 406
+nos-desktop
+historylogger
+pkg canding install system-update
+npm install
+passwd
+ping canding
+login
+ps
+reboot
+ifconfig
+nos-desktop.js
+ls
+exit

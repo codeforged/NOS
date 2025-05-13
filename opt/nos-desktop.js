@@ -1,0 +1,101 @@
+module.exports = {
+  instanceName: "nosdesktop",
+  name: "NOS Desktop",
+  version: 0.5,
+  needRoot: true,
+  author: "Andriansah",
+  main: function (nos) {
+    var devices = [
+      { name: "websocket1", objectName: "ws" },
+      { name: "fileAccess", objectName: "fa" },
+    ];
+    this.failed = !this.shell.loadDevices(devices, this);
+    if (this.failed) {
+      this.shell.terminate();
+      return;
+    }
+
+    let webshell;
+    const ws = this.ws;
+    this.msg = `✅ NOS Desktop starting`;
+    this.crt.textOut(this.msg);
+    if (!this.ws.remoteFunction) this.ws.remoteFunction = {};
+    this.ws.remoteFunction.desktop = {}; // Create a namespace
+
+    let apps = [];
+    this.sendMessage = (msgChannel, cb) => {
+      this.ws.sendMessage(msgChannel, cb);
+    };
+
+    this.ws.remoteFunction.desktop.getLaunchers = (params) => {
+      apps = [];
+      let appFiles = this.fa.readdirSync("opt/gui/apps");
+      appFiles.forEach((fn) => {
+        delete require.cache[
+          require.resolve(this.shell.basePath + `/opt/gui/apps/${fn}`)
+        ];
+        let application = require(this.shell.basePath +
+          `/opt/gui/apps/${fn}`).application();
+        application.header.fileName = fn;
+        apps.push(application);
+      });
+
+      let launchers = [];
+      let x = 10;
+      let y = 0;
+      for (let i = 0; i < apps.length; i++) {
+        apps[i].header.x = x;
+        apps[i].header.y = y;
+        y += 75;
+        if ((i + 1) % 7 == 0) {
+          x += 80;
+          y = 0;
+        }
+        launchers.push({
+          header: apps[i].header,
+        });
+      }
+      return btoa(JSON.stringify(launchers));
+    };
+    this.ws.remoteFunction.desktop.getModule = (params) => {
+      let appName = params[0];
+      for (let i = 0; i < apps.length; i++) {
+        if (apps[i].header.appName == appName) {
+          delete require.cache[
+            require.resolve(
+              this.shell.basePath + `/opt/gui/apps/${apps[i].header.fileName}`
+            )
+          ];
+          let application = require(this.shell.basePath +
+            `/opt/gui/apps/${apps[i].header.fileName}`).application();
+
+          let content = {
+            header: application.header,
+            content: encodeURIComponent(application.content),
+            jsContent: encodeURIComponent(application.jsContent.toString()),
+          };
+          try {
+            application.main(this, nos);
+          } catch (e) {
+            this.crt.textOut(e + "\n" + e.stack);
+          }
+          return btoa(JSON.stringify(content));
+          break;
+        }
+      }
+    };
+
+    // this.shell.terminate();
+  },
+  // 🎖️ exitSignal pakai Promise
+  exitSignal: function () {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(); // Wajib panggil resolve biar core tahu selesai
+      }, 500); // simulasi delay
+    });
+  },
+};
+
+// dec:/home root⚡ (node:553034) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 resize listeners added to [WriteStream]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+// (Use `node --trace-warnings ...` to show where the warning was created)
