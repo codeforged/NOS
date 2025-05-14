@@ -14,16 +14,27 @@ module.exports = {
     this.controller = this.mqtnl.connMgr.scanBroadcastController(2000);
 
     this.display.textOut("Scanning NOS nodes via broadcast...");
-
+    function isJSONParsable(str) {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
     this.controller.nmap().then((results) => {
       if (!results.length) {
         this.display.textOut("No NOS node found.");
       } else {
         this.display.textOut(`Found ${results.length} node(s):`);
         results.forEach((node, idx) => {
+          let info;
+          if (isJSONParsable(node.info))
+            info = ` | UUID: ${JSON.parse(node.info).uuid}`; else
+            info = " (encrypted)";
           this.display.textOut(
-            `${idx + 1}. ${node.srcAddress}`
-            // `${idx + 1}. ${node.srcAddress} | Info: ${JSON.stringify(node.info)}`
+            // `${idx + 1}. ${node.srcAddress} `
+            `${idx + 1}. ${node.srcAddress}${info}`
           );
         });
       }

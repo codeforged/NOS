@@ -7,7 +7,7 @@ const path = require("path");
 
 module.exports = {
   name: "ftd",
-  version: "1.4",
+  version: "1.6",
   needRoot: true,
   main: function (nos) {
     const { chaSharekey } = require(`${this.shell.basePath}/lib/api-shop.js`);
@@ -26,8 +26,8 @@ module.exports = {
     const args = this.shell.parseCommand(this.shell.lastCmd);
     const keys = Object.keys(args.params);
     if (keys.includes("p")) port = parseInt(args.params.p);
-    if (keys.includes("h")) homePath = parseInt(args.params.h);
-    if (keys.includes("k")) passwd = parseInt(args.params.k);
+    if (keys.includes("h")) homePath = args.params.h;
+    if (keys.includes("k")) passwd = args.params.k;
 
     const privateKey = fs.readFileSync(
       `${this.shell.basePath}/opt/conf/private.pem`,
@@ -80,7 +80,8 @@ module.exports = {
       stack.setTTLFor(src, 60000 * 1);
       stack.setAuthRequired(src, true);
       stack.setAuthHandler((token) => {
-        if (token == passwd) return true; else return false;
+        if (token == passwd) return true;
+        else return false;
       });
       stack.onSessionExpired = (src) => {
         stack.send(src, "__session::timeout");
@@ -94,7 +95,8 @@ module.exports = {
       stack.onAuthVerified = (session, src, isAuthenticated) => {
         stack.send(
           src,
-          `${isAuthenticated ? "✅" : "⚠️ "} Authentication ${isAuthenticated ? "success" : "failed"
+          `${isAuthenticated ? "✅" : "⚠️ "} Authentication ${
+            isAuthenticated ? "success" : "failed"
           }.`
         );
       };
@@ -118,7 +120,9 @@ module.exports = {
           let json = JSON.parse(payload);
           if (json.mode == "sendfile") {
             const zlib = require("zlib");
-            const uncompressedData = zlib.inflateSync(Buffer.from(json.content, "base64"));
+            const uncompressedData = zlib.inflateSync(
+              Buffer.from(json.content, "base64")
+            );
             this.fa.writeFileSync(homePath + json.path, uncompressedData, true);
             // this.fa.writeFileSync(json.path, uncompressedData);
             stack.send(
@@ -207,10 +211,11 @@ module.exports = {
             try {
               this.crt.textOut(
                 `[Listener] >> ` +
-                this.shell.basePath + homePath +
-                filename +
-                " : " +
-                content
+                  this.shell.basePath +
+                  homePath +
+                  filename +
+                  " : " +
+                  content
               );
               stack.send(client, "✅ File uploaded");
             } catch (e) {
