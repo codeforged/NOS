@@ -29,7 +29,7 @@ with a philosophy and experience similar to Linux OS, but running on top of MQTT
   `nettop`/`nettopgui` apps to monitor traffic of each connection live.
 - **NOS Shell & CLI:**  
   Shell scripting, commands like `ifconfig`, `fwset`, `scannos`, etc.
-- **NOS GUI System (NGS):**  
+- **NOS Desktop (Experimental):**  
   Lightweight desktop environment with monitoring, editor, and other apps.
 - **Open Source & Extensible:**  
   Easy to develop, integrate, and hack by the community.
@@ -85,8 +85,15 @@ This project is open source and licensed under the **MIT License**. Feel free to
 ---
 
 ## 📸 Screenshot
+NOS Dekstop screen:
+![NOS Desktop](docs/NOS-Desktop1.png)
 
-![NOS Network Monitor](docs/screenshot-nettopgui.png)
+MQTNL Network Monitor:
+
+![NOS Network Monitor](docs/NOS-Desktop2.png)
+
+Starting Screen:
+![Starting Screen](docs/Starting-Screen.png)
 
 ---
 

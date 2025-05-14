@@ -10,9 +10,15 @@ passwd
 ping canding
 login
 ps
-reboot
 ifconfig
 nos-desktop.js
 ls
+scannos.js
+reboot
+nettop.js
+airterm canding
 pkg canding install system-update
+scannos
+nettop
+qexit
 exit
