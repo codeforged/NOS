@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkg",
-  version: "0.7",
+  version: "0.72",
   needRoot: true,
   main: function (nos) {
     const chaSharekey =
@@ -44,13 +44,6 @@ module.exports = {
     if (args.params && args.params.p) {
       port = parseInt(args.params.p);
     }
-    // console.log(JSON.stringify(args));
-    // return;
-
-    // const args = this.shell.lastCmd.split(" ");
-    // const host = args[1];
-    // const cmd = args[2];
-    // const targetPackage = args[3];
 
     if (!host || !cmd) {
       this.crt.textOut("❌ Gunakan: pkg <host> list | install <package>");
@@ -108,7 +101,82 @@ module.exports = {
         stack.activeSession = stack.getSession(src);
         // this.crt.textOut(`✅ Secure session established to ${host}`);
 
-        if (cmd === "list") {
+        if (cmd === "status") {
+          const metaPath = "/opt/conf/packages.meta.json";
+          let meta = { packages: [] };
+          if (this.fa.fileExistsSync(metaPath)) {
+            try {
+              meta = JSON.parse(this.fa.readFileSync(metaPath, "utf8"));
+            } catch (e) {
+              this.crt.textOut("❌ Error reading meta file.");
+              this.shell.terminate();
+              return;
+            }
+          }
+
+          // Helper untuk ambil versi repo
+          const getRepoVersion = async (pkgName) => {
+            return new Promise((resolve) => {
+              stack.send(
+                dst,
+                JSON.stringify({ type: "getinfo", package: pkgName })
+              );
+              stack.onDecryptedMessage((payload, src) => {
+                try {
+                  const info = JSON.parse(payload);
+                  // this.crt.textOut(JSON.stringify(info));
+                  if (info.data == "Package not found!") {
+                    this.crt.textOut("Package not found!");
+                    resolve("-");
+                  } else
+                    if (info.type === "packageInfo" && info.data) {
+                      resolve(String(info.data.version));
+                    }
+                } catch {
+                  resolve("-");
+                }
+              });
+            });
+          };
+
+          // Jika ada targetPackage, cek satu paket
+          if (targetPackage) {
+            const metaPkg = meta.packages.find(p => p.name === targetPackage);
+            const localVersion = metaPkg ? String(metaPkg.version) : "-";
+            getRepoVersion(targetPackage).then(repoVersion => {
+              if (repoVersion !== "-") {
+                this.crt.textOut(
+                  `📦 ${targetPackage}\n  Lokal: ${localVersion}\n  Repo : ${repoVersion}\n`
+                );
+              }
+              this.shell.terminate();
+            });
+          } else {
+            // Cek semua paket di meta
+            if (meta.packages.length === 0) {
+              this.crt.textOut("There are no packages installed locally.");
+              this.shell.terminate();
+              return;
+            }
+            let idx = 0;
+            const printNext = () => {
+              if (idx >= meta.packages.length) {
+                this.shell.terminate();
+                return;
+              }
+              const pkg = meta.packages[idx];
+              getRepoVersion(pkg.name).then(repoVersion => {
+                this.crt.textOut(
+                  `📦 ${pkg.name}\n  Local: ${pkg.version}\n  Repo : ${repoVersion}\n`
+                );
+                idx++;
+                printNext();
+              });
+            };
+            printNext();
+          }
+          return;
+        } else if (cmd === "list") {
           stack.send(dst, JSON.stringify({ type: "list" }));
 
           stack.onDecryptedMessage(async (payload, src) => {

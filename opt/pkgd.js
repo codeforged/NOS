@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkgd",
-  version: "0.5",
+  version: "0.52",
   needRoot: true,
   main: function (nos) {
     const chaSharekey =
@@ -36,16 +36,6 @@ module.exports = {
     const publicKey = this.fa.readFileSync(`/opt/conf/public.pem`, "utf8");
     const rsaKeyPair = { publicKey, privateKey };
 
-    // let cha = nos.__CORE.encryption.addInstance(
-    //   "pkgd",
-    //   "chacha20-poly1305",
-    //   nos.sysConfig.chacha20poly.key
-    // );
-    // const reverseAgent = {
-    //   name: "reverse",
-    //   cipher: (data) => data.split("").reverse().join(""),
-    //   decipher: (data) => data.split("").reverse().join(""),
-    // };
     const conn = new this.mqtnl.mqtnlConnection(this.mqtnl.connMgr, port);
     const stack = new chaSharekey(conn);
     stack.negotiateKeyExchangeAsServer(rsaKeyPair, (sharedKey, src) => {
@@ -73,13 +63,6 @@ module.exports = {
           if (data.type === "list") {
             const checksig = require(this.shell.basePath + "/lib/pkglib");
             const packagesPath = "/opt/conf/packages.signed.json";
-
-            // const packagesJson = JSON.parse(
-            //   this.fa.readFileSync(packagesPath, "utf8")
-            // );
-            // const packages = (packagesJson.packages || []).filter(
-            //   (p) => p.active
-            // );
 
             let packagesStr = fs.readFileSync(
               this.shell.basePath + packagesPath,
@@ -129,7 +112,9 @@ module.exports = {
             );
 
             if (!pkg) {
-              this.crt.textOut(`⚠️ Package '${data.package}' tidak ditemukan`);
+              // this.crt.textOut(`⚠️ Package '${data.package}' tidak ditemukan`);
+              const packetInfo = { type: "packageInfo", data: "Package not found!" };
+              await stack.send(client, JSON.stringify(packetInfo));
               return;
             }
 
