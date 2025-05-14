@@ -11,9 +11,6 @@ ping canding
 login
 ps
 ifconfig
-nos-desktop.js
-ls
-scannos.js
 reboot
 nettop.js
 airterm canding
@@ -21,4 +18,7 @@ pkg canding install system-update
 scannos
 nettop
 qexit
+scannos.js
+nos-desktop.js
+ls
 exit
