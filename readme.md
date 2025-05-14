@@ -4,7 +4,7 @@
 **Codename**: "The Lightweight Awakens"  
 **Release Date**: May 14, 2025  
 
-> NOS is not an OS — it's a node scripting framework, terminal-first, encryption-aware, modular by nature.
+> It's a node scripting framework, terminal-first, encryption-aware, modular by nature.
 
 ---
 
