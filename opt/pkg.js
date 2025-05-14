@@ -7,9 +7,10 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkg",
-  version: "0.72",
+  version: "0.73",
   needRoot: true,
   main: function (nos) {
+    const flags = require(`${this.shell.basePath}/lib/packetFlags.js`);
     const chaSharekey =
       require(`${this.shell.basePath}/lib/api-shop.js`).chaSharekey;
     const checksig = require(this.shell.basePath + "/lib/pkglib");
@@ -64,21 +65,15 @@ module.exports = {
       true
     );
     conn.onPacketReceive((packet, key) => {
-      if (packet.header.packetHeaderFlag != 1234) return;
+      if (packet.header.packetHeaderFlag != flags.FLAG_FILE_SENDING) return;
       const { packetCount, packetIndex } = packet.header;
 
       if (packetCount > 0) {
         const percent = Math.floor(((packetIndex + 1) / packetCount) * 100);
         const progressBar = drawProgressBar(percent);
         this.crt.write(`\r${progressBar}`);
-        // if (packetIndex == 0) {
-        //   this.crt.textOut(
-        //     `\rDownloading file ...                              `
-        //   );
-        // }
         if (percent === 100) {
           console.log(""); // pindah baris kalau selesai
-          // this.crt.textOut(`\nWritting file ...`);
         }
       }
     });
@@ -181,40 +176,42 @@ module.exports = {
 
           stack.onDecryptedMessage(async (payload, src) => {
             try {
-              const data = JSON.parse(payload);
-              if (data.type === "list-reply" && Array.isArray(data.packages)) {
-                const signerFP = data.fingerPrintRepository;
-                // console.log(`signerFP: ${signerFP}`);
-                let trustedSource =
-                  nos.sysConfig.packageManager.trustedSigners.includes(
-                    signerFP
-                  );
-                if (!trustedSource) {
-                  this.crt.textOut(
-                    `⚠️ Signature is valid, but the signer is not on your trusted list.\nFingerprint: ${signerFP}`
-                  );
+              if (typeof payload === "string" && payload.trim().startsWith("{")) {
+                const data = JSON.parse(payload);
+                if (data.type === "list-reply" && Array.isArray(data.packages)) {
+                  const signerFP = data.fingerPrintRepository;
+                  // console.log(`signerFP: ${signerFP}`);
+                  let trustedSource =
+                    nos.sysConfig.packageManager.trustedSigners.includes(
+                      signerFP
+                    );
+                  if (!trustedSource) {
+                    this.crt.textOut(
+                      `⚠️ Signature is valid, but the signer is not on your trusted list.\nFingerprint: ${signerFP}`
+                    );
+                  } else {
+                    this.crt.textOut(
+                      `✅ Signature is valid and was signed by a trusted host.`
+                    );
+                  }
+                  if (data.packageSignatureStatus === true)
+                    this.crt.textOut(`✅ Metadata signature status valid`);
+                  else this.crt.textOut(`❌ Metadata signature status invalid`);
+                  this.crt.textOut("📦 Available Packages:");
+                  data.packages.forEach((pkg) => {
+                    this.crt.textOut(
+                      `- ${pkg.name} (${pkg.version}) by ${pkg.author}\n  ${pkg.description}\n  ${pkg.status} signature\n ` +
+                      ` ${pkg.isPackageSafe || trustedSource
+                        ? "✅ This package does not modify system files or run scripts automatically."
+                        : "❌ This package may contain scripts that can affect your system. Please review before installing!"
+                      }\n`
+                    );
+                  });
                 } else {
-                  this.crt.textOut(
-                    `✅ Signature is valid and was signed by a trusted host.`
-                  );
+                  this.crt.textOut("⚠️ Format list invalid.");
                 }
-                if (data.packageSignatureStatus === true)
-                  this.crt.textOut(`✅ Metadata signature status valid`);
-                else this.crt.textOut(`❌ Metadata signature status invalid`);
-                this.crt.textOut("📦 Available Packages:");
-                data.packages.forEach((pkg) => {
-                  this.crt.textOut(
-                    `- ${pkg.name} (${pkg.version}) by ${pkg.author}\n  ${pkg.description}\n  ${pkg.status} signature\n ` +
-                    ` ${pkg.isPackageSafe || trustedSource
-                      ? "✅ This package does not modify system files or run scripts automatically."
-                      : "❌ This package may contain scripts that can affect your system. Please review before installing!"
-                    }\n`
-                  );
-                });
-              } else {
-                this.crt.textOut("⚠️ Format list invalid.");
+                this.shell.terminate();
               }
-              this.shell.terminate();
             } catch (e) {
               this.crt.textOut(`❌ Error parsing list: ${e}`);
               this.shell.terminate();

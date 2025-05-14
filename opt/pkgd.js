@@ -1,3 +1,4 @@
+
 // ============================================
 // pkgd.js - NOS Package Manager Server
 // ============================================
@@ -7,9 +8,10 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkgd",
-  version: "0.52",
+  version: "0.53",
   needRoot: true,
   main: function (nos) {
+    const flags = require(`${this.shell.basePath}/lib/packetFlags.js`);
     const chaSharekey =
       require(`${this.shell.basePath}/lib/api-shop.js`).chaSharekey;
     this.shell.loadDevices(
@@ -150,7 +152,7 @@ module.exports = {
                 };
 
                 await stack.send(client, JSON.stringify(filePacket), {
-                  packetHeaderFlag: 1234,
+                  packetHeaderFlag: flags.FLAG_FILE_SENDING,
                 });
                 this.crt.textOut(`📦 Sent file: ${item.dst}`);
               } catch (err) {
