@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 module.exports = {
   name: "passwd",
-  version: "1.5",
+  version: "1.6",
   description: "Ubah password user yang sedang login dan simpan sysconfig",
   usage: "passwd",
   needRoot: false,
@@ -18,7 +18,7 @@ module.exports = {
 
     if (!username || !Array.isArray(users)) {
       crt.textOut(
-        "❌ Tidak bisa mendapatkan user aktif atau data user tidak valid.\n"
+        "❌ Unable to get active user or user data is invalid.\n"
       );
       this.shell.terminate();
       return;
@@ -26,34 +26,34 @@ module.exports = {
 
     const user = users.find((u) => u.username === username);
     if (!user) {
-      crt.textOut("❌ User tidak ditemukan.\n");
+      crt.textOut("❌ User not found.\n");
       this.shell.terminate();
       return;
     }
 
     const oldPass = await this.shell.userPrompt(
-      "🔐 Masukkan password lama: ",
+      "🔐 Enter old password: ",
       false
     );
     const hashedInput = crypto.createHash("sha1").update(oldPass).digest("hex");
 
     if (hashedInput !== user.password) {
-      crt.textOut("❌ Password lama salah.\n");
+      crt.textOut("❌ Old password is incorrect.\n");
       this.shell.terminate();
       return;
     }
 
     const newPass1 = await this.shell.userPrompt(
-      "🆕 Masukkan password baru: ",
+      "🆕 Enter new password: ",
       false
     );
     const newPass2 = await this.shell.userPrompt(
-      "🆕 Ulangi password baru: ",
+      "🆕 Confirm new password: ",
       false
     );
 
     if (newPass1 !== newPass2) {
-      crt.textOut("❌ Password baru tidak cocok.\n");
+      crt.textOut("❌ Confirmation password does not match.\n");
       this.shell.terminate();
       return;
     }
@@ -66,9 +66,9 @@ module.exports = {
 
     try {
       this.fa.writeFileSync(fullPath, formatted);
-      crt.textOut("✅ Password berhasil diubah dan sysconfig.js disimpan.\n");
+      crt.textOut("✅ Password successfully changed and saved.\n");
     } catch (err) {
-      crt.textOut("❌ Gagal menyimpan sysconfig.js: " + err.message + "\n");
+      crt.textOut("❌ Failed to save password: " + err.message + "\n");
     }
 
     this.shell.terminate();
