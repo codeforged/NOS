@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkgd",
-  version: "0.4",
+  version: "0.5",
   needRoot: true,
   main: function (nos) {
     const chaSharekey =
@@ -119,6 +119,23 @@ module.exports = {
             };
 
             stack.send(client, JSON.stringify(reply));
+          } else if (data.type === "getinfo" && data.package) {
+            const packagesPath = "/opt/conf/packages.signed.json";
+            const packagesJson = JSON.parse(
+              this.fa.readFileSync(packagesPath, "utf8")
+            );
+            const pkg = (packagesJson.packages || []).find(
+              (p) => p.name === data.package
+            );
+
+            if (!pkg) {
+              this.crt.textOut(`⚠️ Package '${data.package}' tidak ditemukan`);
+              return;
+            }
+
+            const packetInfo = { type: "packageInfo", data: pkg };
+            await stack.send(client, JSON.stringify(packetInfo));
+            // this.crt.textOut(`✅ Finished sending package '${pkg.name}'`);
           } else if (data.type === "get" && data.package) {
             const packagesPath = "/opt/conf/packages.signed.json";
             const packagesJson = JSON.parse(
@@ -160,7 +177,7 @@ module.exports = {
 
             const donePacket = { type: "done", onAfterDownload: pkg.onAfterDownload };
             await stack.send(client, JSON.stringify(donePacket));
-            this.crt.textOut(`✅ Finished sending package '${pkg.name}'`);
+            // this.crt.textOut(`✅ Finished sending package '${pkg.name}'`);
           }
         } catch (err) {
           this.crt.textOut(`❌ Error parsing payload: ${err.message}`);

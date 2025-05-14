@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkg",
-  version: "0.6",
+  version: "0.7",
   needRoot: true,
   main: function (nos) {
     const chaSharekey =
@@ -153,76 +153,114 @@ module.exports = {
             }
           });
         } else if (cmd === "install" && targetPackage) {
-          stack.send(
-            dst,
-            JSON.stringify({ type: "get", package: targetPackage })
-          );
-
-          let pendingFiles = 0;
-
-          async function receiveFiles() {
-            stack.onDecryptedMessage(async (payload, src) => {
-              try {
-                const data = JSON.parse(payload);
-                if (data.type === "preparing") {
-                  this.crt.textOut("Downloading ...");
-                } else if (data.type === "file") {
-                  const compressedBuffer = Buffer.from(data.data, "base64");
-                  const fileBuffer = zlib.inflateSync(compressedBuffer);
-                  const dstPath = data.filename;
-                  const dstDir = path.dirname(this.shell.basePath + dstPath);
-                  // this.crt.textOut("xxx" + dstDir);
-                  try {
-                    this.fa.mkdirSync(dstDir, { recursive: true });
-                  } catch (e) {
-                    console.log(e);
-                  }
-                  // this.crt.textOut("Writting ...");
-                  this.fa.writeFileSync(dstPath, fileBuffer, true);
-                  // this.crt.textOut(`dstPath: ${dstPath}\n fileBuffer: ${fileBuffer}`)
-                  this.crt.textOut(
-                    `📂 Saved file: ${data.filename} (${dynamicUnit(
-                      fileBuffer.length
-                    )})`
-                  );
-                  pendingFiles++;
-                } else if (data.type === "done") {
-
-                  if (typeof data.onAfterDownload != "undefined") {
-                    this.crt.textOut(`Executing installation script ...` + data.onAfterDownload);
-                    // let args = this.shell.lastCmd.split(" ");
-                    // let fullPath = this.find(args[0], this.envPath);
-                    const path = require("path");
-                    const directory = path.dirname(data.onAfterDownload);
-                    const fileName = path.basename(data.onAfterDownload);
-
-                    let errorLevel = nos.executeModule(
-                      this.shell.basePath + directory,
-                      fileName,
-                      () => { },
-                      this.shell,
-                      this.shell.rootActive,
-                      this.shell.lastCmd
-                    );
-                  }
-                  this.crt.textOut(
-                    `✅ Install selesai. ${pendingFiles} file diunduh.`
-                  );
-
-                  this.shell.terminate();
-                }
-              } catch (e) {
-                this.crt.textOut(`❌ Error parsing/installing file: ${JSON.stringify(e)}`);
-                // throw {
-                //   code: 2,
-                //   message: `pkg error: ${e.message}\n${e.stack}`,
-                // };
-                this.shell.terminate();
-              }
-            });
+          // --- PATCH: Version check and meta file management ---
+          const metaPath = "/opt/conf/packages.meta.json";
+          let meta = { packages: [] };
+          if (this.fa.fileExistsSync(metaPath)) {
+            try {
+              meta = JSON.parse(this.fa.readFileSync(metaPath, "utf8"));
+            } catch (e) { }
           }
 
-          receiveFiles.call(this); // supaya this tetap ke module.exports
+          // 1. Request package info first
+          stack.send(
+            dst,
+            JSON.stringify({ type: "getinfo", package: targetPackage })
+          );
+
+          stack.onDecryptedMessage(async (payload, src) => {
+            try {
+              const info = JSON.parse(payload);
+              if (info.type === "packageInfo" && info.data) {
+                const repoVersion = String(info.data.version);
+                const pkgName = info.data.name;
+
+                // Cari versi lokal di meta
+                let metaPkg = meta.packages.find(p => p.name === pkgName);
+                let metaVersion = metaPkg ? String(metaPkg.version) : null;
+
+                // Jika sudah ada dan versi sama/lebih besar, prompt user
+                if (metaVersion && (metaVersion === repoVersion || metaVersion > repoVersion)) {
+                  this.crt.textOut(
+                    `⚠️  Package '${pkgName}' is already at version ${metaVersion} (repo: ${repoVersion}). Continue install? (y/n): `
+                  );
+                  const answer = await this.shell.userPrompt("Type 'yes' to continue installation: ", true);
+                  if (answer.trim().toLowerCase() !== "yes") {
+                    this.crt.textOut("❌ Install cancelled by user.");
+                    this.shell.terminate();
+                    return;
+                  }
+                }
+
+                // Lanjutkan proses install (request file)
+                stack.send(
+                  dst,
+                  JSON.stringify({ type: "get", package: targetPackage })
+                );
+
+                let pendingFiles = 0;
+                const self = this;
+
+                stack.onDecryptedMessage(async function handleInstall(payload2, src2) {
+                  try {
+                    const data = JSON.parse(payload2);
+                    if (data.type === "preparing") {
+                      self.crt.textOut("Downloading ...");
+                    } else if (data.type === "file") {
+                      const compressedBuffer = Buffer.from(data.data, "base64");
+                      const fileBuffer = zlib.inflateSync(compressedBuffer);
+                      const dstPath = data.filename;
+                      const dstDir = path.dirname(self.shell.basePath + dstPath);
+                      try {
+                        self.fa.mkdirSync(dstDir, { recursive: true });
+                      } catch (e) { }
+                      self.fa.writeFileSync(dstPath, fileBuffer, true);
+                      self.crt.textOut(
+                        `📂 Saved file: ${data.filename} (${dynamicUnit(fileBuffer.length)})`
+                      );
+                      pendingFiles++;
+                    } else if (data.type === "done") {
+                      if (typeof data.onAfterDownload != "undefined") {
+                        self.crt.textOut(`Executing installation script ...` + data.onAfterDownload);
+                        const path = require("path");
+                        const directory = path.dirname(data.onAfterDownload);
+                        const fileName = path.basename(data.onAfterDownload);
+                        nos.executeModule(
+                          self.shell.basePath + directory,
+                          fileName,
+                          () => { },
+                          self.shell,
+                          self.shell.rootActive,
+                          self.shell.lastCmd
+                        );
+                      }
+                      // Update meta file setelah install sukses
+                      let idx = meta.packages.findIndex(p => p.name === pkgName);
+                      if (idx >= 0) {
+                        meta.packages[idx].version = repoVersion;
+                      } else {
+                        meta.packages.push({ name: pkgName, version: repoVersion });
+                      }
+                      self.fa.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+                      self.crt.textOut(
+                        `✅ Install selesai. ${pendingFiles} file diunduh.`
+                      );
+                      self.shell.terminate();
+                    }
+                  } catch (e) {
+                    self.crt.textOut(`❌ Error parsing/installing file: ${JSON.stringify(e)}`);
+                    self.shell.terminate();
+                  }
+                });
+              } else {
+                this.crt.textOut("❌ Failed to get package info from server.");
+                this.shell.terminate();
+              }
+            } catch (e) {
+              this.crt.textOut(`❌ Error parsing package info: ${JSON.stringify(e)}`);
+              this.shell.terminate();
+            }
+          });
         } else {
           this.crt.textOut(
             "❓ Unknown command. Gunakan 'list' atau 'install <package>'."
