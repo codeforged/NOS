@@ -1,29 +1,37 @@
-function webSocket(nos, port) {
-  const WebSocket = require("ws");
-  this.name = "websocket";
-  this.nos = nos;
-  this.devClass = "Web Socket";
-  this.version = 0.12;
-  this.port = port;
+class WebSocketDriver {
+  constructor(nos, port) {
+    const WebSocket = require("ws");
+    this.name = "websocket";
+    this.nos = nos;
+    this.devClass = "Web Socket";
+    this.version = 0.13;
+    this.port = port;
 
-  this.WebSocket = require("ws");
-  this.wss = new WebSocket.Server({ port: this.port });
-  this.clientList = [];
-  this.remoteFunction = {}; // tetap
+    this.WebSocket = WebSocket;
+    this.wss = new WebSocket.Server({ port: this.port });
+    this.clientList = [];
+    this.remoteFunction = {};
+    this.listenerRegistry = {};
 
-  this.listenerRegistry = {}; // MID ➜ socket
+    this.wss.on("connection", (ws, req) => {
+      const ip = req.socket.remoteAddress;
+      this.clientList.push({ ip, socket: ws });
 
-  this.read = (data) => {};
+      ws.on("message", (raw) => {
+        this._read(raw, ws);
+      });
+    });
+  }
 
-  this.setRFCObject = (o) => {
+  setRFCObject(o) {
     this.remoteFunction = o;
-  };
+  }
 
-  this._read = (raw, ws) => {
+  _read(raw, ws) {
     try {
       const o = JSON.parse(raw);
 
-      // === RFC Classic (eval style) ===
+      // RFC Classic (eval style)
       if (o.callType === "function" && o.name && Array.isArray(o.params)) {
         const fn = `this.remoteFunction.${o.name}(${JSON.stringify(o.params)})`;
         const r = eval(fn);
@@ -37,34 +45,33 @@ function webSocket(nos, port) {
           this.write(JSON.stringify(reply));
         }
       }
-
-      // === MSG Listener Registration ===
+      // MSG Listener Registration
       else if (
         o.protocol === "MSG" &&
         o.type === "registerListener" &&
         o.msgChannel
       ) {
         this.listenerRegistry[o.msgChannel] = ws;
-        nos
+        this.nos
           .getDevice("syslogger")
           .append(`✅ MID listener registered: ${o.msgChannel}`);
       }
     } catch (e) {
-      nos.getDevice("syslogger").append(`❌ WebSocket error: ${e.message}`);
+      this.nos.getDevice("syslogger").append(`❌ WebSocket error: ${e.message}`);
     }
-  };
+  }
 
-  this.write = (data) => {
+  write(data) {
     this.wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
+      if (client.readyState === this.WebSocket.OPEN) {
         client.send(data);
       }
     });
-  };
+  }
 
-  this.sendMessage = (msgChannel, payload) => {
+  sendMessage(msgChannel, payload) {
     const target = this.listenerRegistry[msgChannel];
-    if (target && target.readyState === WebSocket.OPEN) {
+    if (target && target.readyState === this.WebSocket.OPEN) {
       const msg = {
         protocol: "MSG",
         msgChannel: msgChannel,
@@ -72,125 +79,103 @@ function webSocket(nos, port) {
       };
       target.send(JSON.stringify(msg));
     }
-  };
+  }
 
-  this.wss.on("connection", (ws, req) => {
-    const ip = req.socket.remoteAddress;
-    this.clientList.push({ ip, socket: ws });
+  getList() {
+    return this.clientList;
+  }
 
-    ws.on("message", (raw) => {
-      this._read(raw, ws); // pasangkan sender-nya
-    });
-  });
+  getClient(ip) {
+    return this.clientList.find((c) => c.ip === ip) || null;
+  }
 }
 
-module.exports = { webSocket };
+module.exports = { webSocket: WebSocketDriver };
 
 // function webSocket(nos, port) {
 //   const WebSocket = require("ws");
 //   this.name = "websocket";
 //   this.nos = nos;
 //   this.devClass = "Web Socket";
-//   this.version = 0.09;
+//   this.version = 0.12;
 //   this.port = port;
 
 //   this.WebSocket = require("ws");
 //   this.wss = new WebSocket.Server({ port: this.port });
 //   this.clientList = [];
+//   this.remoteFunction = {}; // tetap
 
-//   this.getMethods = (obj) => {
-//     let properties = new Set();
-//     let currentObj = obj;
-//     do {
-//       Object.getOwnPropertyNames(currentObj).map((item) =>
-//         properties.add(item)
-//       );
-//     } while ((currentObj = Object.getPrototypeOf(currentObj)));
-//     return [...properties.keys()].filter(
-//       (item) => typeof obj[item] === "function"
-//     );
-//   };
+//   this.listenerRegistry = {}; // MID ➜ socket
 
-//   this.read = (data) => {
-//     // console.log(">> "+data)
-//   };
-//   this.remoteFunction = {};
+//   this.read = (data) => { };
+
 //   this.setRFCObject = (o) => {
 //     this.remoteFunction = o;
 //   };
-//   this._read = (data) => {
-//     this.read(data);
+
+//   this._read = (raw, ws) => {
 //     try {
-//       var o = JSON.parse(data);
-//       if (o.callType == "function") {
-//         // console.log("eval = "+"var r = this.remoteFunction."+o.name+"("+JSON.stringify(o.params)+")");
-//         eval(
-//           "var r = this.remoteFunction." +
-//             o.name +
-//             "(" +
-//             JSON.stringify(o.params) +
-//             ")"
-//         );
-//         // console.log("r: "+JSON.stringify(r));
-//         if (r != 0 && typeof r != "undefined") {
-//           // console.log("kadieu")
-//           var callBackReturn = {
+//       const o = JSON.parse(raw);
+
+//       // === RFC Classic (eval style) ===
+//       if (o.callType === "function" && o.name && Array.isArray(o.params)) {
+//         const fn = `this.remoteFunction.${o.name}(${JSON.stringify(o.params)})`;
+//         const r = eval(fn);
+
+//         if (r !== 0 && typeof r !== "undefined") {
+//           const reply = {
 //             id: o.id,
 //             protocol: "RFC",
 //             ret: r,
 //           };
-//           this.write(JSON.stringify(callBackReturn));
+//           this.write(JSON.stringify(reply));
 //         }
 //       }
+
+//       // === MSG Listener Registration ===
+//       else if (
+//         o.protocol === "MSG" &&
+//         o.type === "registerListener" &&
+//         o.msgChannel
+//       ) {
+//         this.listenerRegistry[o.msgChannel] = ws;
+//         nos
+//           .getDevice("syslogger")
+//           .append(`✅ MID listener registered: ${o.msgChannel}`);
+//       }
 //     } catch (e) {
-//       // send to system log if something fault
-//       nos
-//         .getDevice("syslogger")
-//         .append(`Device ${this.name}: ${e.message} ${e.stack}`);
-//       var callBackReturn = {
-//         id: o.id,
-//         protocol: "RFC",
-//         ret: e.message,
-//       };
-//       this.write(JSON.stringify(callBackReturn));
-//       // console.error(e);
+//       nos.getDevice("syslogger").append(`❌ WebSocket error: ${e.message}`);
 //     }
 //   };
 
-//   this.wss.on("connection", (ws, req) => {
-//     let ip = req.socket.remoteAddress;
-//     //ip = req.headers['x-forwarded-for'].split(',')[0].trim();
-//     ws.on("message", this._read);
-//     this.clientList.push({ ip: ip, socket: ws });
-//   });
-
 //   this.write = (data) => {
-//     this.wss.clients.forEach(function each(client) {
+//     this.wss.clients.forEach((client) => {
 //       if (client.readyState === WebSocket.OPEN) {
 //         client.send(data);
 //       }
 //     });
 //   };
 
-//   this.writeToAddress = (ip, data) => {
-//     var client = this.getClient(ip);
-//     if (client != 0) client.socket.send(data);
-//   };
-
-//   this.getList = () => {
-//     return this.clientList;
-//   };
-
-//   this.getClient = (ip) => {
-//     var result = 0;
-//     for (var i = 0; i < this.clientList.length; i++) {
-//       if (ip == this.clientList[i].ip) {
-//         result = this.clientList[i];
-//         break;
-//       }
+//   this.sendMessage = (msgChannel, payload) => {
+//     const target = this.listenerRegistry[msgChannel];
+//     if (target && target.readyState === WebSocket.OPEN) {
+//       const msg = {
+//         protocol: "MSG",
+//         msgChannel: msgChannel,
+//         data: payload,
+//       };
+//       target.send(JSON.stringify(msg));
 //     }
-//     return result;
 //   };
+
+//   this.wss.on("connection", (ws, req) => {
+//     const ip = req.socket.remoteAddress;
+//     this.clientList.push({ ip, socket: ws });
+
+//     ws.on("message", (raw) => {
+//       this._read(raw, ws); // pasangkan sender-nya
+//     });
+//   });
 // }
 
-// module.exports = { webSocket: webSocket };
+// module.exports = { webSocket };

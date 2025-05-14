@@ -13,7 +13,7 @@ module.exports = {
     // Buat controller scan broadcast (timeout 2000ms)
     this.controller = this.mqtnl.connMgr.scanBroadcastController(2000);
 
-    this.display.textOut("Scanning NOS nodes via broadcast...");
+    this.display.textOut("Scanning NOS comm device via broadcast...");
     function isJSONParsable(str) {
       try {
         JSON.parse(str);
@@ -24,13 +24,13 @@ module.exports = {
     }
     this.controller.nmap().then((results) => {
       if (!results.length) {
-        this.display.textOut("No NOS node found.");
+        this.display.textOut("No NOS comm device found.");
       } else {
-        this.display.textOut(`Found ${results.length} node(s):`);
+        this.display.textOut(`Found ${results.length} comm(s):`);
         results.forEach((node, idx) => {
           let info;
           if (isJSONParsable(node.info))
-            info = ` | UUID: ${JSON.parse(node.info).uuid}`; else
+            info = `\n  - UUID: ${JSON.parse(node.info).uuid}\n  - Device Name: ${JSON.parse(node.info).deviceName}`; else
             info = " (encrypted)";
           this.display.textOut(
             // `${idx + 1}. ${node.srcAddress} `
