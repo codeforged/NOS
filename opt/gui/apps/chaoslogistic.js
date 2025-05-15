@@ -6,6 +6,7 @@ module.exports.application = () => {
     header: {
       appName,
       appTitle,
+      active: true,
       iconSmall: "icon_16_chart.png",
       iconMedium: "icon_22_chart.png",
       iconLarge: "icon_32_chart.png",

@@ -5,6 +5,7 @@ module.exports.application = () => ({
     iconSmall: "icon_16_star.png",
     iconMedium: "icon_22_star.png",
     iconLarge: "icon_32_app.png",
+    active: true,
     width: 900,
     height: 680,
     resizable: true

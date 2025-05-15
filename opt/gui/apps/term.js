@@ -6,6 +6,7 @@ module.exports = {
       header: {
         appName: appName,
         appTitle: appTitle,
+        active: true,
         version: "1.0",
         iconSmall: "icon_16_terminal.png",
         iconMedium: "icon_22_terminal.png",
@@ -53,7 +54,7 @@ module.exports = {
                   });
                 }
               },
-              true // Authentication mode
+              false // Authentication mode
             );
             webShell.parentShell = sender.shell;
             webShell.sysConfig = nos.sysConfig;

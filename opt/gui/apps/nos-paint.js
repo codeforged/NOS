@@ -9,11 +9,13 @@ module.exports = {
       header: {
         appName,
         appTitle,
+        active: true,
         iconSmall: "icon_16_paint.png",
         iconMedium: "icon_22_paint.png",
         iconLarge: "icon_32_paint.png",
         width: 740,
         height: 500,
+        showContentWhileDragging: false,
       },
       content: `
         <div id="main-content-${appName}" style="padding:6px">
@@ -50,7 +52,7 @@ module.exports = {
           <div id="color-boxes" style="display:flex; flex-wrap:wrap; width:100%; margin-top:8px; gap:2px"></div>
         </div>
       `,
-      main: () => {},
+      main: () => { },
       jsContent: (app) => {
         setTimeout(() => {
           const canvas = document.getElementById(

@@ -31,13 +31,16 @@ module.exports = {
       apps = [];
       let appFiles = this.fa.readdirSync("opt/gui/apps");
       appFiles.forEach((fn) => {
+
         delete require.cache[
           require.resolve(this.shell.basePath + `/opt/gui/apps/${fn}`)
         ];
         let application = require(this.shell.basePath +
           `/opt/gui/apps/${fn}`).application();
-        application.header.fileName = fn;
-        apps.push(application);
+        if (application.header.active === true) {
+          application.header.fileName = fn;
+          apps.push(application);
+        }
       });
 
       let launchers = [];
@@ -60,7 +63,7 @@ module.exports = {
     this.ws.remoteFunction.desktop.getModule = (params) => {
       let appName = params[0];
       for (let i = 0; i < apps.length; i++) {
-        if (apps[i].header.appName == appName) {
+        if (apps[i].header.active === true && apps[i].header.appName == appName) {
           delete require.cache[
             require.resolve(
               this.shell.basePath + `/opt/gui/apps/${apps[i].header.fileName}`
@@ -68,7 +71,6 @@ module.exports = {
           ];
           let application = require(this.shell.basePath +
             `/opt/gui/apps/${apps[i].header.fileName}`).application();
-
           let content = {
             header: application.header,
             content: encodeURIComponent(application.content),

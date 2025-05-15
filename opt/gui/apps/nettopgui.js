@@ -7,6 +7,7 @@ module.exports = {
       header: {
         appName,
         appTitle,
+        active: true,
         iconSmall: "icon_16_network.png",
         iconMedium: "icon_22_network.png",
         iconLarge: "icon_32_network.png",

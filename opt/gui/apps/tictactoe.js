@@ -3,6 +3,7 @@ module.exports.application = () => ({
     appName: "tictactoe",
     version: "1.1",
     appTitle: "Tic Tac Toe",
+    active: true,
     iconSmall: "icon_16_star.png",
     iconMedium: "icon_22_star.png",
     iconLarge: "icon_32_app.png",

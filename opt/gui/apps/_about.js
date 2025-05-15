@@ -8,6 +8,7 @@ module.exports = {
         appId: "787",
         appName,
         appTitle,
+        active: true,
         iconSmall: "icon_16_app.png",
         iconMedium: "icon_22_app.png",
         iconLarge: "icon_32_app.png",

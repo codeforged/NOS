@@ -24,6 +24,7 @@ module.exports = {
         appName,
         appTitle,
         guid, // bisa dipakai untuk keperluan lain
+        active: true,
         iconSmall: "icon_16_chart.png",
         iconMedium: "icon_22_chart.png",
         iconLarge: "icon_32_chart.png",
@@ -52,7 +53,7 @@ module.exports = {
         <span class="progressbar-semicircle" data-gauge="humid"></span>
       </div>
       `,
-      main: (sender, nos) => {},
+      main: (sender, nos) => { },
       jsContent: (app) => {
         // Cari root aplikasi berdasarkan data-guid unik
         const root = document.querySelector(
