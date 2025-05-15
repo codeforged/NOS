@@ -85,30 +85,6 @@ void NOS::connectMQTT() {
     }
 }
 
-// return [
-// 0  packet.header.srcAddress,
-// 1  packet.header.srcPort,
-// 2  packet.header.dstAddress,
-// 3  packet.header.dstPort,
-// 4  packet.header.packetCount,
-// 5  packet.header.packetIndex,
-// 6  packet.header.dataSize,
-// 7  packet.header.packetHeaderFlag,
-// 8  packet.header.forwarded,
-// 9  packet.payload
-// ];
-
-// void NOS::mqttCallback(char* topic, byte* payload, unsigned int length) {
-//     StaticJsonDocument<512> doc;
-//     deserializeJson(doc, payload, length);
-    
-//     const char* srcAddress = doc[0];
-//     int srcPort = doc[1];
-//     const char* dstAddress = doc[2];
-//     int dstPort = doc[3];
-//     const char* message = doc[9];
-//     int packetHeaderFlag = doc[7];
-
 void NOS::mqttCallback(char* topic, byte* payload, unsigned int length) {
     // Salin payload ke buffer yang bisa dimodifikasi
     char buffer[512];
