@@ -1,7 +1,14 @@
+/**
+ * Gauge Dashboard for ESP32
+ * author: Andriansah
+ *
+ **/
+
 function generateGUID() {
   // Simple GUID generator
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -45,64 +52,60 @@ module.exports = {
         <span class="progressbar-semicircle" data-gauge="humid"></span>
       </div>
       `,
-      main: (sender, nos) => { },
+      main: (sender, nos) => {},
       jsContent: (app) => {
         // Cari root aplikasi berdasarkan data-guid unik
-        const root = document.querySelector(`.main-content[data-guid="${app.header.guid}"]`);
+        const root = document.querySelector(
+          `.main-content[data-guid="${app.header.guid}"]`
+        );
         const tempElem = root.querySelector('[data-gauge="temp"]');
         const humidElem = root.querySelector('[data-gauge="humid"]');
 
-        let bar1 = new ProgressBar.SemiCircle(
-          tempElem,
-          {
-            strokeWidth: 6,
-            color: "#5FEA82",
-            trailColor: "#eee",
-            trailWidth: 1,
-            easing: "easeInOut",
-            duration: 400,
-            svgStyle: null,
-            text: {
-              value: "",
-              alignToBottom: true,
-            },
-            from: { color: "#ACEA82" },
-            to: { color: "#ED6A5A" },
-            step: (state, bar) => {
-              bar.path.setAttribute("stroke", state.color);
-              var value = Math.round(bar.value() * 100);
-              bar.setText(`${value}<br/>Temp`);
-              bar.text.style.color = state.color;
-            },
-          }
-        );
+        let bar1 = new ProgressBar.SemiCircle(tempElem, {
+          strokeWidth: 6,
+          color: "#5FEA82",
+          trailColor: "#eee",
+          trailWidth: 1,
+          easing: "easeInOut",
+          duration: 400,
+          svgStyle: null,
+          text: {
+            value: "",
+            alignToBottom: true,
+          },
+          from: { color: "#ACEA82" },
+          to: { color: "#ED6A5A" },
+          step: (state, bar) => {
+            bar.path.setAttribute("stroke", state.color);
+            var value = Math.round(bar.value() * 100);
+            bar.setText(`${value}<br/>Temp`);
+            bar.text.style.color = state.color;
+          },
+        });
         bar1.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
         bar1.text.style.fontSize = "1.5rem";
 
-        let bar2 = new ProgressBar.SemiCircle(
-          humidElem,
-          {
-            strokeWidth: 6,
-            color: "#5FEA82",
-            trailColor: "#eee",
-            trailWidth: 1,
-            easing: "easeInOut",
-            duration: 400,
-            svgStyle: null,
-            text: {
-              value: "",
-              alignToBottom: true,
-            },
-            from: { color: "#AFEA82" },
-            to: { color: "#ED6A5A" },
-            step: (state, bar) => {
-              bar.path.setAttribute("stroke", state.color);
-              var value = Math.round(bar.value() * 100);
-              bar.setText(`${value}<br/>Humid`);
-              bar.text.style.color = state.color;
-            },
-          }
-        );
+        let bar2 = new ProgressBar.SemiCircle(humidElem, {
+          strokeWidth: 6,
+          color: "#5FEA82",
+          trailColor: "#eee",
+          trailWidth: 1,
+          easing: "easeInOut",
+          duration: 400,
+          svgStyle: null,
+          text: {
+            value: "",
+            alignToBottom: true,
+          },
+          from: { color: "#AFEA82" },
+          to: { color: "#ED6A5A" },
+          step: (state, bar) => {
+            bar.path.setAttribute("stroke", state.color);
+            var value = Math.round(bar.value() * 100);
+            bar.setText(`${value}<br/>Humid`);
+            bar.text.style.color = state.color;
+          },
+        });
         bar2.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
         bar2.text.style.fontSize = "2rem";
 
