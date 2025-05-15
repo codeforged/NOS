@@ -4,22 +4,19 @@
 // === Konfigurasi ===
 #define WIFI_SSID     "BabamGo"
 #define WIFI_PASSWORD "bismillah"
-// #define WIFI_SSID     "K1ngUn1c0rn"
-// #define WIFI_PASSWORD "32321000"
 #define MQTT_SERVER   "192.168.0.105"
-// #define MQTT_SERVER   "62.72.31.252"
 #define MQTT_PORT     1883
 
 // Kunci enkripsi 256-bit (32 bytes)
 char key[KEY_SIZE] = {
-  0x81, 0xFF, 0x71, 0xED, 0x57, 0x4E, 0x54, 0x59,
-  0x76, 0x90, 0xAE, 0x7B, 0x04, 0xE4, 0xEF, 0x5F,
-  0xC8, 0x74, 0x97, 0xFE, 0x10, 0xB6, 0xB0, 0x37,
-  0xCB, 0x03, 0x1A, 0xF7, 0xC7, 0xD6, 0x76, 0x19
+  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+  0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+  0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
 };
 
 // === Inisialisasi NOS ===
-NOS nos("myESP2", 100, key, MQTT_SERVER, MQTT_PORT);
+NOS nos("myESP", 100, key, MQTT_SERVER, MQTT_PORT);
 
 // === Fungsi: Handler pesan masuk ===
 void messageReceived(const char* srcAddress, int srcPort, const char* payload) {
@@ -63,25 +60,10 @@ void loop() {
   nos.loop();  // Harus dipanggil terus-menerus
 
   static uint32_t lastSent = 0;
-  // Menyimpan nilai saat ini, mulai dari 10
-  static int currentValue = 10;  
-
-  if (millis() - lastSent >= 2500) {
+  if (millis() - lastSent >= 1000) {
     char data[64];
-    // Menghasilkan delta acak antara -5 sampai +5
-    int delta = random(-5, 6);  // random(-5, 6) menghasilkan nilai -5, -4, ..., 4, 5
-    currentValue += delta;
-    
-    // Memastikan nilai tidak keluar dari batas 1 sampai 100
-    if (currentValue < 1) {
-      currentValue = 1;
-    }
-    if (currentValue > 100) {
-      currentValue = 100;
-    }
-    
-    sprintf(data, "02=%d", currentValue);
-    nos.sendPacket("espiot", 1000, data);
+    sprintf(data, "We're from ESP32 %lu, prepare yourself!", millis());
+    nos.sendPacket("dec", 1000, data);
     Serial.println("Packet sent.");
     lastSent = millis();
   }
