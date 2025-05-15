@@ -1,12 +1,22 @@
+function generateGUID() {
+  // Simple GUID generator
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 module.exports = {
   application: () => {
     let appName = "progressbar1";
     let appTitle = "ESP32 Gauges";
+    let guid = generateGUID();
 
     return {
       header: {
         appName,
         appTitle,
+        guid, // bisa dipakai untuk keperluan lain
         iconSmall: "icon_16_chart.png",
         iconMedium: "icon_22_chart.png",
         iconLarge: "icon_32_chart.png",
@@ -16,32 +26,34 @@ module.exports = {
       },
       content: `
       <style>
-  #main-content-${appName} {
-    display: flex;
-    justify-content: center; /* center horizontal */
-    align-items: center;     /* center vertical */
-    gap: 40px;               /* jarak antar gauge */
-    height: 100%;           /* atur tinggi area */
-    text-align: center;
-    flex-wrap: wrap;         /* biar responsive kalau sempit */
-
-  }
-
-  .progressbar-semicircle {
-    width: 200px;
-    height: 100px;
-  }
-</style>
-
-<div id="main-content-${appName}">
-  <span id="container1-${appName}" class="progressbar-semicircle"></span>
-  <span id="container2-${appName}" class="progressbar-semicircle"></span>
-</div> 
+        .main-content[data-guid="${guid}"] {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 40px;
+          height: 100%;
+          text-align: center;
+          flex-wrap: wrap;
+        }
+        .progressbar-semicircle {
+          width: 200px;
+          height: 100px;
+        }
+      </style>
+      <div class="main-content" data-app="${appName}" data-guid="${guid}">
+        <span class="progressbar-semicircle" data-gauge="temp"></span>
+        <span class="progressbar-semicircle" data-gauge="humid"></span>
+      </div>
       `,
       main: (sender, nos) => { },
       jsContent: (app) => {
+        // Cari root aplikasi berdasarkan data-guid unik
+        const root = document.querySelector(`.main-content[data-guid="${app.header.guid}"]`);
+        const tempElem = root.querySelector('[data-gauge="temp"]');
+        const humidElem = root.querySelector('[data-gauge="humid"]');
+
         let bar1 = new ProgressBar.SemiCircle(
-          `#container1-${app.header.appName}`,
+          tempElem,
           {
             strokeWidth: 6,
             color: "#5FEA82",
@@ -68,7 +80,7 @@ module.exports = {
         bar1.text.style.fontSize = "1.5rem";
 
         let bar2 = new ProgressBar.SemiCircle(
-          `#container2-${app.header.appName}`,
+          humidElem,
           {
             strokeWidth: 6,
             color: "#5FEA82",
@@ -140,21 +152,6 @@ module.exports = {
           };
         }
 
-        function updateGauge(id, bar, done) {
-          RFCSensorGauges.callRFC("nto.getData", [id], (res) => {
-            try {
-              if (res && res.value) {
-                const v = parseFloat(res.value);
-                const safeVal = Math.max(0, Math.min(100, v));
-                bar.animate(safeVal / 100); // progressbar expects 0.0–1.0
-              }
-              if (done) done();
-            } catch (e) {
-              console.log(e);
-            }
-          });
-        }
-
         $(this).ready(() => {
           connect();
         });
@@ -162,108 +159,3 @@ module.exports = {
     };
   },
 };
-
-// module.exports = {
-//   application: () => {
-//     let appName = "progressbar1";
-//     let appTitle = "Progress Bar Demo";
-
-//     return {
-//       header: {
-//         appName,
-//         appTitle,
-//         iconSmall: "icon_16_drive.png",
-//         iconMedium: "icon_22_drive.png",
-//         iconLarge: "icon_32_drive.png",
-//         width: 600,
-//         height: 300
-//       },
-//       content: `
-//       <style>
-//         #main-content-${appName} {
-//           text-align: center;
-//         }
-//         .progressbar-semicircle {
-//           margin: 20px;
-//           width: 200px;
-//           height: 100px;
-//           float: left;
-//         }
-//       </style>
-//       <div id="main-content-${appName}">
-//         <span id="container1-${appName}" class="progressbar-semicircle"></span>
-//         <span id="container2-${appName}" class="progressbar-semicircle"></span>
-//       </div>
-//       `,
-//       main: (sender, nos) => {
-//         // Optional backend logic (NOS side)
-//         sender.crt.textOut("[NOS App] " + appTitle + " started.\n");
-//       },
-//       jsContent: (app) => {
-//         var bar1 = new ProgressBar.SemiCircle(`#container1-${app.header.appName}`, {
-//           strokeWidth: 6,
-//           color: '#5FEA82',
-//           trailColor: '#eee',
-//           trailWidth: 1,
-//           easing: 'easeInOut',
-//           duration: 400,
-//           svgStyle: null,
-//           text: {
-//             value: 'Temperature',
-//             alignToBottom: true
-//           },
-//           from: { color: '#AC7A82' },
-//           to: { color: '#ED6A5A' },
-//           // Set default step function for all animate calls
-//           step: (state, bar) => {
-//             bar.path.setAttribute('stroke', state.color);
-//             var value = Math.round(bar.value() * 100);
-//             if (value === 0) {
-//               bar.setText('');
-//             } else {
-//               bar.setText(value + "<br/>Temp");
-//             }
-
-//             bar.text.style.color = state.color;
-//           }
-//         });
-//         bar1.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-//         bar1.text.style.fontSize = '1.5rem';
-
-//         bar1.animate(.3);  // Number from 0.0 to 1.0
-
-//         var bar2 = new ProgressBar.SemiCircle(`#container2-${app.header.appName}`, {
-//           strokeWidth: 6,
-//           color: '#5FEA82',
-//           trailColor: '#eee',
-//           trailWidth: 1,
-//           easing: 'easeInOut',
-//           duration: 400,
-//           svgStyle: null,
-//           text: {
-//             value: '',
-//             alignToBottom: true
-//           },
-//           from: { color: '#AF7A82' },
-//           to: { color: '#ED6A5A' },
-//           // Set default step function for all animate calls
-//           step: (state, bar) => {
-//             bar.path.setAttribute('stroke', state.color);
-//             var value = Math.round(bar.value() * 100);
-//             if (value === 0) {
-//               bar.setText('');
-//             } else {
-//               bar.setText(value + "<br/>Humid");
-//             }
-
-//             bar.text.style.color = state.color;
-//           }
-//         });
-//         bar2.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
-//         bar2.text.style.fontSize = '2rem';
-
-//         bar2.animate(.8);  // Number from 0.0 to 1.0
-//       }
-//     };
-//   }
-// };
