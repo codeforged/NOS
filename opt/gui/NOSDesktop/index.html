@@ -186,11 +186,17 @@
 
       $(document).on('click', '.desktop-window', function () {
         let topIndex = 0;
+        let topElement = null;
         $(".desktop-window").each(function () {
           const zindex = $(this).css('z-index');
-          if (topIndex < parseInt(zindex)) topIndex = parseInt(zindex);
+          if (topIndex < parseInt(zindex)) {
+            topElement = $(this);
+            topIndex = parseInt(zindex);
+          }
         });
-        const windowPanel = $(this).css('z-index', topIndex + 1)
+        const thisZindex = parseInt($(this).css('z-index'))
+        topElement.css('z-index', thisZindex);
+        const windowPanel = $(this).css('z-index', topIndex)
       });
     });
     settingsApp = null;

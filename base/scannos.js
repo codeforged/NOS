@@ -1,7 +1,7 @@
 module.exports = {
   name: "NOS Broadcast Scan",
-  version: 0.1,
-  main: function (os) {
+  version: 0.2,
+  main: function () {
     var devices = [
       { name: __APP.defaultComm, objectName: "mqtnl" },
     ];
@@ -11,7 +11,7 @@ module.exports = {
     // Reset sequence
     this.mqtnl.connMgr.pingResetSequence();
     // Buat controller scan broadcast (timeout 2000ms)
-    this.controller = this.mqtnl.connMgr.scanBroadcastController(2000);
+    this.controller = this.mqtnl.connMgr.scanBroadcastController(500);
 
     this.display.textOut("Scanning NOS comm device via broadcast...");
     function isJSONParsable(str) {
@@ -46,8 +46,6 @@ module.exports = {
 
     this.shell.interruptSignalListener.push(() => {
       this.controller.interrupt();
-      this.display.textOut("Scan interrupted.");
-      this.shell.terminate();
     });
   }
 };
