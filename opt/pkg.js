@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkg",
-  version: "0.73",
+  version: "0.74",
   needRoot: true,
   main: function (nos) {
     const flags = require(`${this.shell.basePath}/lib/packetFlags.js`);
@@ -162,7 +162,7 @@ module.exports = {
               const pkg = meta.packages[idx];
               getRepoVersion(pkg.name).then(repoVersion => {
                 this.crt.textOut(
-                  `📦 ${pkg.name}\n  Local: ${pkg.version}\n  Repo : ${repoVersion}\n`
+                  `📦 ${pkg.name}\n  Local: ${pkg.version}\n  Repo : ${repoVersion == "-" ? "Not availale" : repoVersion}\n`
                 );
                 idx++;
                 printNext();
