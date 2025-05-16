@@ -2,13 +2,14 @@
 
 **Version**: Ochroma Pyramidale v1.1  
 **Codename**: "The Lightweight Awakens"  
-**Release Date**: May 14, 2025  
+**Release Date**: May 14, 2025
 
 > It's a node scripting framework, terminal-first, encryption-aware, modular by nature.
 
 ---
 
 ## 🌱 What is NOS?
+
 **NOS (Node-Oriented System)**  
 NOS is a lightweight, modular scripting framework for IoT communication, education, and prototyping,  
 with a philosophy and experience similar to Linux OS, but running on top of MQTT Network Layer (MQTNL) and modern platforms.
@@ -70,11 +71,11 @@ Replace `<basepath>` with the absolute path to your NOS installation directory.
 
 ## 📦 Project Structure
 
-- `base/`      : Main CLI scripts (ping, scannos, etc)
-- `opt/gui/`   : GUI applications (nettopgui, etc)
-- `lib/`       : Core libraries (mqttNetworkLib.js, NOSPacketStackV2, etc)
-- `dev/`       : Devices & drivers
-- `home/`      : User configuration
+- `base/` : Main CLI scripts (ping, scannos, etc)
+- `opt/gui/` : GUI applications (nettopgui, etc)
+- `lib/` : Core libraries (mqttNetworkLib.js, NOSPacketStackV2, etc)
+- `dev/` : Devices & drivers
+- `home/` : User space and some examples script
 
 ---
 
@@ -85,6 +86,7 @@ This project is open source and licensed under the **MIT License**. Feel free to
 ---
 
 ## 📸 Screenshot
+
 NOS Dekstop screen:
 ![NOS Desktop](docs/NOS-Desktop1.png)
 
@@ -105,6 +107,7 @@ Starting Screen:
 ---
 
 ## 📚 Documentation
+
 Available soon.
 
 ---
@@ -125,7 +128,7 @@ pkg canding install system-update
 - **Password:** `canding`
 
 > Please change your root password after first login for security reasons.
-Using CLI: passwd
+> Using CLI: passwd
 
 ---
 
