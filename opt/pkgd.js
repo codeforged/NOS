@@ -39,7 +39,7 @@ module.exports = {
     const rsaKeyPair = { publicKey, privateKey };
 
     const conn = new this.mqtnl.mqtnlConnection(this.mqtnl.connMgr, port);
-    const stack = new chaSharekey(conn);
+    let stack = new chaSharekey(conn);
     stack.negotiateKeyExchangeAsServer(rsaKeyPair, (sharedKey, src) => {
       const session = stack.getSession(src);
       let secretKey = Buffer.from(sharedKey, "hex");
@@ -174,6 +174,7 @@ module.exports = {
 
     this.exitSignal = () => {
       stack.close();
+      stack = null
       this.crt.textOut("⛔ Package server stopped.");
     };
 
