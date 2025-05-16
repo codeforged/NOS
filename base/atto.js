@@ -1,7 +1,7 @@
 module.exports = {
   instanceName: "atto",
   name: "atto",
-  version: 0.23,
+  version: 0.24,
   main: function (nos) {
     // Memuat fileDriver sebagai device
     const devices = [
@@ -12,29 +12,29 @@ module.exports = {
 
     // Parsing command-line arguments
     const args = this.shell.parseCommand(this.shell.lastCmd);
-    
+
     const showSyntax = () => {
       this.display.textOut(`atto, a simple text editor.\n`);
       this.display.textOut(`Syntax: ${args.command} <filename>`);
       this.shell.terminate();
     }
-    
+
     if (!args.params._) {
       showSyntax();
       return;
     }
 
-    const filename = this.shell.pwd+args.params._[0];    
+    const filename = this.shell.pwd + args.params._[0];
     try {
       let content = this.fd.readFileSync(filename);
       // this.display.textOut("Content: "+content);
       content = content.replaceAll("\t", "  ");
-      const {SimpleTextEditor} = require(this.shell.basePath+"/lib/texteditor");
-      this.display.rows = process.stdout.rows;
-      this.display.columns = process.stdout.columns;
+      const { SimpleTextEditor } = require(this.shell.basePath + "/lib/texteditor");
+      this.display.rows = this.shell.crt.rows;
+      this.display.columns = this.shell.crt.columns;
       let myeditor = new SimpleTextEditor(content, this.display);
       myeditor.onExit = () => {
-        this.shell.keyboardActive = true;                
+        this.shell.keyboardActive = true;
         this.shell.terminate();
         this.shell.getKey = null;
         myeditor = null;
@@ -54,7 +54,7 @@ module.exports = {
       myeditor.discard = () => {
         this.display.clear();
         if (myeditor.changed == true)
-          myeditor.stdout.write("Exiting without save...\n");     
+          myeditor.stdout.write("Exiting without save...\n");
       }
       this.shell.keyboardActive = false;
       this.shell.getKey = (io) => {
@@ -64,6 +64,6 @@ module.exports = {
       }
     } catch (e) {
       this.display.textOut(e);
-    }  
+    }
   }
 }

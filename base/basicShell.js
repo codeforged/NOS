@@ -34,6 +34,7 @@ class Shell {
     this.rootActive = false;
     this.interruptSignalListener = [];
     this.promptVisible = true;
+    this.syslog = nos.getDevice("syslogger");
 
     this.crt = {
       rows: process.stdout.rows,
@@ -63,6 +64,12 @@ class Shell {
         }
       },
     };
+    if (!this.crt.rows) this.crt.rows = 24;
+    if (!this.crt.columns) this.crt.columns = 80;
+
+    this.syslog.append(
+      `New shell spawn at ${this.crt.rows}:${this.crt.columns} (Rows:Cols)`,
+    );
 
     process.stdout.on("resize", () => {
       let rows = process.stdout.rows;
@@ -157,10 +164,10 @@ class Shell {
       let errorLevel = this.#nos.executeModule(
         directory,
         fileName,
-        () => { },
+        () => {},
         this,
         this.rootActive,
-        lastCmd
+        lastCmd,
       );
     } catch (e) {
       if (e.code == 1 || e.code == 2 || e.code == 3) {
@@ -219,7 +226,7 @@ class Shell {
         "%pwd",
         this.pwd.length > 1 && this.pwd.endsWith("/") === true
           ? this.pwd.substring(0, this.pwd.length - 1)
-          : this.pwd
+          : this.pwd,
       );
       str = str.replaceAll("%username", this.username);
       str = str.replaceAll("%hostname", this.#nos.hostName);
@@ -290,9 +297,9 @@ class Shell {
                 } else {
                   reject(false);
                 }
-              }
+              },
             );
-          }
+          },
         );
       } else {
         new userPrompt(
@@ -313,7 +320,7 @@ class Shell {
             } else {
               reject(false);
             }
-          }
+          },
         );
       }
     });
