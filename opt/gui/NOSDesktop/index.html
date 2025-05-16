@@ -43,6 +43,7 @@
 	</script> -->
 
   <script type="text/javascript">
+    let NOSDesktopVersion = "1.0.7";
     let ws, RFC;
     let appList = [];
     let launcherList = [];
@@ -182,6 +183,15 @@
 
     $(function () {
       connect();
+
+      $(document).on('click', '.desktop-window', function () {
+        let topIndex = 0;
+        $(".desktop-window").each(function () {
+          const zindex = $(this).css('z-index');
+          if (topIndex < parseInt(zindex)) topIndex = parseInt(zindex);
+        });
+        const windowPanel = $(this).css('z-index', topIndex + 1)
+      });
     });
     settingsApp = null;
 

@@ -271,7 +271,10 @@ $.extend($.fn.window.methods, {
 			}
 		});
 		header.find('.panel-tool').children('a').removeAttr('href').css('cursor', 'pointer');
-		if (app.showContentWhileDragging === true) app.win.dialog('dragWithNoProxy'); else
+		if (app.showContentWhileDragging === true) {
+			app.win.dialog('dragWithNoProxy');
+			app.win.dialog('open');
+		} else
 			app.win.dialog('open');
 		app.taskId = 'desktop_task' + (TASKID++);
 
