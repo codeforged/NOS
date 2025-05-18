@@ -1,5 +1,5 @@
 function cygRFC(ws) {
-  this.version = "3.0";
+  this.version = "3.1";
   this.ws = ws;
   this.pendingCalls = {}; // id ➜ callback
   this.listeners = {}; // mid ➜ callback
@@ -31,7 +31,7 @@ function cygRFC(ws) {
         const cb = this.listeners[jsdata.msgChannel];
         if (cb) cb(jsdata.data);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   this.remoteCall = (param, callBack, timeoutMs = 10000) => {
@@ -50,6 +50,10 @@ function cygRFC(ws) {
     };
     this.ws.send(JSON.stringify(param));
     return id;
+  };
+
+  this.callRFC = (name, params = [], callBack = {}) => {
+    this.remoteCall({ name, params }, callBack);
   };
 
   this.registerListener = (msgChannel, callback) => {
