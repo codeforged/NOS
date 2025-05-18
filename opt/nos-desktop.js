@@ -1,7 +1,7 @@
 module.exports = {
   instanceName: "nosdesktop",
   name: "NOS Desktop",
-  version: 0.5,
+  version: 0.6,
   needRoot: true,
   author: "Andriansah",
   main: function (nos) {
@@ -13,6 +13,14 @@ module.exports = {
     if (this.failed) {
       this.shell.terminate();
       return;
+    }
+
+    this.generateUUID = () => {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0,
+          v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
     }
 
     let webshell;
@@ -70,7 +78,7 @@ module.exports = {
             )
           ];
           let application = require(this.shell.basePath +
-            `/opt/gui/apps/${apps[i].header.fileName}`).application();
+            `/opt/gui/apps/${apps[i].header.fileName}`).application(this.generateUUID());
           let content = {
             header: application.header,
             content: encodeURIComponent(application.content),

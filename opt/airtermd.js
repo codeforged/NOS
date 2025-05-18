@@ -47,8 +47,8 @@ module.exports = {
       };
       let secretKey = Buffer.from(sharedKey, "hex");
       session.cha = nos.__CORE.encryption.addInstance(
-        `airtermd${session.id}`,
-        "chacha20-poly1305",
+        `airtermd${session.id}`, // Nama instan sekuriti agen
+        "chacha20-poly1305", // Nama agen yang dipilih, di register di cryptoconf.js
         secretKey
         // "reverse", ""
       );

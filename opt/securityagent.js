@@ -12,12 +12,6 @@ module.exports = {
     const core_encryption = __APP.core.encryption;
 
     if (keys.includes("-list")) {
-      // for (let agentClass of core_encryption.encryptions) {
-      //   const name = agentClass.name || agentClass?.prototype?.name || "Unknown";
-      //   const desc = agentClass.description || agentClass?.prototype?.description || "No description";
-      //   this.display.textOut(`${name.padEnd(25)} :: ${desc}`);
-      // }
-      // Kelompokkan berdasarkan jenis encryption (name)
       const classes = core_encryption.encryptions;
       const instances = core_encryption.instances;
       this.display.textOut("");

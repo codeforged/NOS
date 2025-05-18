@@ -72,6 +72,7 @@ Replace `<basepath>` with the absolute path to your NOS installation directory.
 ## 📦 Project Structure
 
 - `base/` : Main CLI scripts (ping, scannos, etc)
+- `opt/` : Optional scripts, configuration file
 - `opt/gui/` : GUI applications (nettopgui, etc)
 - `lib/` : Core libraries (mqttNetworkLib.js, NOSPacketStackV2, etc)
 - `dev/` : Devices & drivers
@@ -96,6 +97,20 @@ MQTNL Network Monitor:
 
 Starting Screen:
 ![Starting Screen](docs/Starting-Screen.png)
+
+---
+
+## ⚠️ NOS-Desktop Security Disclaimer
+
+NOS-Desktop uses WebSocket/HTTP for communication between the backend (Node.js) and the web browser (graphics engine).
+**The IP address and WebSocket port used are the responsibility of the user/admin.**
+
+- Make sure the port/IP is not exposed to the public network without adequate security.
+- It is recommended to run NOS-Desktop on a local/isolated network.
+- Use a firewall or reverse proxy to restrict access if necessary.
+- All risks related to port/IP exposure are the responsibility of the user/admin.
+
+> NOS-Desktop does not use non-TCP/IP protocols for browser ↔ backend communication, as per modern browser security restrictions.
 
 ---
 
