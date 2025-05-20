@@ -7,7 +7,7 @@ const zlib = require("zlib");
 
 module.exports = {
   name: "pkg",
-  version: "0.74",
+  version: "0.77",
   needRoot: true,
   main: function (nos) {
     const flags = require(`${this.shell.basePath}/lib/packetFlags.js`);
@@ -201,9 +201,9 @@ module.exports = {
                   data.packages.forEach((pkg) => {
                     this.crt.textOut(
                       `- ${pkg.name} (${pkg.version}) by ${pkg.author}\n  ${pkg.description}\n  ${pkg.status} signature\n ` +
-                      ` ${pkg.isPackageSafe || trustedSource
+                      ` ${pkg.isPackageSafe
                         ? "✅ This package does not modify system files or run scripts automatically."
-                        : "❌ This package may contain scripts that can affect your system. Please review before installing!"
+                        : "⚠️ **This package contain scripts that can affect your system.\n    Please review before installing!"
                       }\n`
                     );
                   });
@@ -232,14 +232,14 @@ module.exports = {
             dst,
             JSON.stringify({ type: "getinfo", package: targetPackage })
           );
-
+          let needReboot = 0;
           stack.onDecryptedMessage(async (payload, src) => {
             try {
               const info = JSON.parse(payload);
               if (info.type === "packageInfo" && info.data) {
                 const repoVersion = String(info.data.version);
                 const pkgName = info.data.name;
-
+                needReboot = info.data.needReboot;
                 // Cari versi lokal di meta
                 let metaPkg = meta.packages.find(p => p.name === pkgName);
                 let metaVersion = metaPkg ? String(metaPkg.version) : null;
@@ -265,8 +265,7 @@ module.exports = {
 
                 let pendingFiles = 0;
                 const self = this;
-
-                stack.onDecryptedMessage(async function handleInstall(payload2, src2) {
+                stack.onDecryptedMessage(async (payload2, src2) => {
                   try {
                     const data = JSON.parse(payload2);
                     if (data.type === "preparing") {
@@ -308,8 +307,14 @@ module.exports = {
                       }
                       self.fa.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
                       self.crt.textOut(
-                        `✅ Install selesai. ${pendingFiles} file diunduh.`
+                        `✅ Install selesai. ${pendingFiles} file diunduh`
                       );
+                      if (needReboot === true) {
+                        const answer = await this.shell.userPrompt("This package need reboot, type 'yes' to continue reboot.", true);
+                        if (answer.trim().toLowerCase() == "yes") {
+                          nos.shutdown(1); //errorlevel 1 untuk reboot, feeder ke bootstrap.sh
+                        }
+                      }
                       self.shell.terminate();
                     }
                   } catch (e) {
