@@ -1,7 +1,7 @@
 module.exports = {
   instanceName: "dynamic_rsh_psv2",
   name: "Dynamic RSH (PacketStackV2)",
-  version: "1.3",
+  version: "1.4",
   needRoot: false,
   main: function (nos) {
     const NOSPacketStackV2 = require(`${this.shell.basePath}/lib/NOSPacketStackV2.js`);
@@ -183,7 +183,20 @@ module.exports = {
         let cols = process.stdout.columns;
         packetStack.send(dst, JSON.stringify({ payload: `__termresize::${rows},${cols}` }));
       })
+
+      if (!this.shell.onResizeListener)
+        this.shell.onResizeListener = [];
+
+      this.shell.onResizeListener.push((rows, cols) => {
+        packetStack.send(dst, JSON.stringify({ payload: `__termresize::${rows},${cols}` }));
+      })
       packetStack.send(dst, JSON.stringify({ payload: "requestConnect" }));
+      setTimeout(() => {
+        packetStack.send(dst, JSON.stringify({
+          payload:
+            `__termresize::${this.shell.crt.rows},${this.shell.crt.columns}`
+        }));
+      }, 2000);
     });
 
     let ctrlCCount = 0;
