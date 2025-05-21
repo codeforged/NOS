@@ -21,6 +21,8 @@
   <script src="lib/js/_timetravel.js"></script>
 
   <link rel="stylesheet" href="lib/js/bootstrap/bootstrap.min.css" />
+  <!-- Latest compiled and minified JavaScript -->
+
   <link rel="stylesheet" href="lib/js/codemirror-5.65.19/lib/codemirror.css" />
 
   <link rel="stylesheet" href="lib/js/codemirror-5.65.19/theme/monokai.css" />
@@ -30,12 +32,14 @@
   <script src="lib/js/tinymce/tinymce.min.js"></script>
   <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
   <script src="node_modules/xterm/lib/xterm.js"></script>
-  <!-- <script src="node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script> -->
+  <script src="node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
 
   <script src="./node_modules/chart.js/dist/chart.umd.js"></script>
 
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600,800,900" rel="stylesheet" type="text/css" />
   <script src="lib/js/progressbar.js/dist/progressbar.min.js"></script>
+
+  <script src="lib/js/zinnia/zinnia.js"></script>
 
   <!-- <script type="module">
     import { Terminal } from "https://cdn.jsdelivr.net/npm/xterm@5.2.1/+esm";
@@ -195,7 +199,7 @@
           }
         });
         const thisZindex = parseInt($(this).css('z-index'))
-        topElement.css('z-index', thisZindex);
+        if (topElement) topElement.css('z-index', thisZindex);
         const windowPanel = $(this).css('z-index', topIndex)
       });
     });
