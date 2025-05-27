@@ -1,4 +1,4 @@
-// Developed by Canding & GPT-40 (2024–2025)
+// Developed by Canding
 // NOS: A Framework Forged by Mind and Machine
 
 const vm = require("vm");
