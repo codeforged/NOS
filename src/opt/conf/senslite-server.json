@@ -1,0 +1,30 @@
+{
+  "server_configuration": {
+    "title": "IoT Dashboard", 
+    "websocket_device": "websocket1",
+    "mqtnl_device": "comm1",
+    "incoming_port": 1000,
+    "data_dictionary": [
+      {
+        "id": "01",
+        "name": "temperature",
+        "data_type": "number"
+      },
+      {
+        "id": "02",
+        "name": "humidity",
+        "data_type": "number"
+      },
+      {
+        "id": "03",
+        "name": "light",
+        "data_type": "number"
+      },
+      {
+        "id": "04",
+        "name": "soil",
+        "data_type": "number"
+      }
+    ]
+  }
+}

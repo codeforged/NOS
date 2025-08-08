@@ -1,0 +1,14 @@
+{
+  "wallpaper": {
+    "path": "/opt/gui/wallpapers/default.png",
+    "data": null
+  },
+  "theme": "gray",
+  "startupScriptPath": "/opt/gui/script/default-startup.js",
+  "startupScript": "",
+  "desktopSettings": {
+    "showClock": true,
+    "showWeather": false,
+    "iconSize": "medium"
+  }
+}

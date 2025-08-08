@@ -1,0 +1,182 @@
+<!-- nre-template.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>NOS Runtime Environment</title>
+  <link rel="stylesheet" type="text/css" href="jquery-easyui/themes/gray/easyui.css" />
+  <link rel="stylesheet" type="text/css" href="jquery-easyui/themes/icon.css" />
+  <link rel="stylesheet" type="text/css" href="desktop.css" />
+  <script src="jquery-easyui/jquery.min.js"></script>
+  <script src="jquery-easyui/jquery.easyui.min.js"></script>
+  <script src="jquery.desktop.js"></script>
+  <style>
+    @font-face {
+      font-family: "oswald";
+      src: url("lib/js/PressStart2P-vaV7.ttf");
+    }
+  </style>
+  <script src="lib/js/cygRFC.js"></script>
+  <script src="lib/js/_timetravel.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+Mono:wght@100..900&family=Press+Start+2P&family=VT323&display=swap"
+    rel="stylesheet">
+
+
+  <link rel="stylesheet" href="lib/js/bootstrap/bootstrap.min.css" />
+  <script src="lib/js/bootstrap/bootstrap.bundle.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/lib/codemirror.css" />
+
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/theme/monokai.css" />
+  <script src="lib/js/codemirror-5.65.19/lib/codemirror.js"></script>
+  <script src="lib/js/codemirror-5.65.19/mode/javascript/javascript.js"></script>
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/addon/fold/foldgutter.css">
+  <script src="lib/js/codemirror-5.65.19/addon/fold/xml-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/indent-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/markdown-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/foldcode.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/foldgutter.js"></script>
+  <script src="lib/js/codemirror-5.65.19/keymap/sublime.js"></script>
+
+  <script src="lib/js/tinymce/tinymce.min.js"></script>
+  <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
+  <script src="node_modules/xterm/lib/xterm.js"></script>
+  <script src="node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+
+  <script src="./node_modules/chart.js/dist/chart.umd.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600,800,900" rel="stylesheet" type="text/css" />
+  <script src="lib/js/progressbar.js/dist/progressbar.min.js"></script>
+
+  <script src="lib/js/zinnia/zinnia.js"></script>
+
+</head>
+
+<body>
+  <div title="" id="appContainer" class="panel window window-thinborder desktop-window panel-htop easyui-fluid" style="
+        display: block;
+        width: 100%;
+        height: 100%;
+        left: 0px;
+        top: 0px;
+        position: absolute;
+        z-index: 9039;
+      "></div>
+
+  <script>
+    let NREVersion = "1.0.9";
+    let ws, RFC;
+    function connect() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const wsaddress = urlParams.get("address");
+      let srcaddress = `ws://${wsaddress}`;
+      // let srcaddress = "ws://localhost:8193";
+      ws = new WebSocket(srcaddress);
+
+      ws.onopen = function () {
+        RFC = new cygRFC(ws);
+        window.RFC = RFC;
+
+        RFC.onmessage = function (data) {
+          let crtData = data.split(`\xf0`)[1];
+          if (typeof crtData != "undefined") {
+            crtData = crtData.replace(/\n/g, "\r\n");
+            if (window.term) window.term.write(crtData);
+          }
+        };
+
+        RFC.callRFC = (name, params = [], callBack = {}) => {
+          RFC.remoteCall({ name: name, params: params }, callBack);
+        };
+
+
+        const appName = urlParams.get("appname").toLowerCase();
+
+        RFC.callRFC("desktop.getModule", [appName], (ret) => {
+          if (!ret) return;
+          let { header, content, jsContent } = JSON.parse(atob(ret));
+          content = decodeURIComponent(content);
+          jsContent = decodeURIComponent(jsContent);
+          const appData = JSON.parse(atob(ret));
+
+          /***********************************************************/
+          appData.ngsLibCall = (methodName, params, cb) => {
+            RFC.callRFC(`ngsLib.${methodName}`, params, (ret) => {
+              const retJS = JSON.parse(atob(ret));
+              if (typeof cb === "function") cb(retJS);
+            });
+          }
+          appData.ngsLibCallAsync = (methodName, params) => {
+            return new Promise((resolve, reject) => {
+              RFC.callRFC(`ngsLib.${methodName}`, params, (ret) => {
+                try {
+                  const retJS = JSON.parse(atob(ret));
+                  resolve(retJS);
+                } catch (e) {
+                  reject(e);
+                }
+              });
+            });
+          }
+
+          appData.loadRemoteImage = (imagePath, cb) => {
+            RFC.callRFC("ngsLib.loadImage", [imagePath], (ret) => {
+              const pic = JSON.parse(atob(ret));
+              if (typeof cb === "function") cb(pic);
+            });
+          }
+          appData.loadRemoteImageAsync = (imagePath) => {
+            return new Promise((resolve, reject) => {
+              RFC.callRFC("ngsLib.loadImage", [imagePath], (ret) => {
+                try {
+                  const pic = JSON.parse(atob(ret));
+                  resolve(pic);
+                } catch (e) {
+                  reject(e);
+                }
+              });
+            });
+          }
+
+          appData.setRemoteImage = (imageObj, imgElement) => {
+            imgElement.src = `data:${imageObj.imageMime};base64,${imageObj.imageData}`;
+          };
+          /***********************************************************/
+
+          document.title = appData.header?.appTitle || appName;
+          $("#appContainer").html(content);
+
+          let jsContentError = 0;
+          try {
+            const func = new Function("return " + jsContent)();
+            func(appData);
+          } catch (e) {
+            jsContentError = 1;
+            console.error("Error:", e);
+            RFC.callRFC("desktop.jsContentError", [e, e.stack], () => { });
+          }
+        });
+      };
+
+      ws.onclose = function (e) {
+        console.log("Socket closed. Retry in 1s.", e.reason);
+        setTimeout(connect, 1000);
+      };
+
+      ws.onerror = function (err) {
+        console.error("WebSocket error:", err.message);
+        ws.close();
+      };
+    }
+
+    $(function () {
+      connect();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+{
+  "dashboard_configuration": {
+    "title": "Senslite Dashboard",
+    "datasource": {
+      "server_address": "ws://codeforged.local:8193"
+    },
+    "columns": 3,
+    "rows": 3,
+    "widgets": [
+      {
+        "id": "01",
+        "datasource_id": "01",
+        "type": "line",
+        "title": "Temperature",
+        "row": 1,
+        "col": 1
+      },
+      {
+        "id": "02",
+        "datasource_id": "02",
+        "type": "line",
+        "title": "Humidity",
+        "row": 1,
+        "col": 2
+      },
+      {
+        "id": "03",
+        "datasource_id": "03",
+        "type": "gauge",
+        "title": "Light",
+        "row": 2,
+        "col": 1
+      },
+      {
+        "id": "04",
+        "datasource_id": "04",
+        "type": "gauge",
+        "title": "Soil",
+        "row": 2,
+        "col": 2
+      },
+      {
+        "id": "power",
+        "datasource_id": "01",
+        "type": "nixietube",
+        "title": "Power",
+        "value": "0",
+        "digits": 4,
+        "row": 3,
+        "col": 1
+      },
+      {
+        "id": "airflow",
+        "datasource_id": "02",
+        "type": "text",
+        "title": "Air flow",
+        "text": "0",
+        "row": 3,
+        "col": 2
+      },
+      {
+        "id": "humiditychart",
+        "datasource_id": "02",
+        "type": "line",
+        "title": "Humidity",
+        "text": "0",
+        "row": 1,
+        "col": 3
+      },
+      {
+        "id": "soilchart",
+        "datasource_id": "04",
+        "type": "line",
+        "title": "Soil",
+        "text": "0",
+        "row": 2,
+        "col": 3
+      },
+      {
+        "id": "powerchart",
+        "datasource_id": "01",
+        "type": "line",
+        "title": "Power",
+        "text": "0",
+        "row": 3,
+        "col": 3
+      }
+    ]
+  }
+}

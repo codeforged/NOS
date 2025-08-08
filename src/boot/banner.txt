@@ -1,0 +1,10 @@
+    _______                            
+   / ____(_)______  _______                 NOS: ${NOSVersion}
+  / /_  / / ___/ / / / ___/                 Shell: ${ShellVersion}
+ / __/ / / /__/ /_/ (__  )                  NOS Hostname: ${Hostname}
+/_/ __/_/\___/\__,_/____/  _                test
+   / ____/ /___ ______/ /_(_)________ _     CPU Arch: ${CPUArch}
+  / __/ / / __ `/ ___/ __/ / ___/ __ `/     Total RAM (MB): ${RAMInfo}
+ / /___/ / /_/ (__  ) /_/ / /__/ /_/ /      OS Platform: ${OSType}
+/_____/_/\__,_/____/\__/_/\___/\__,_/       OS Release: ${OSRelease}
+

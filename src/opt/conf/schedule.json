@@ -1,0 +1,20 @@
+[
+  {
+    "name": "startup",
+    "type": "startup",
+    "interval": 0,
+    "command": "pkg-verify --quiet"
+  },
+  {
+    "name": "shutdown",
+    "type": "shutdown",
+    "interval": 10,
+    "command": ""
+  },
+  {
+    "name": "echo",
+    "type": "repeatable",
+    "interval": 10,
+    "command": ""
+  }
+]

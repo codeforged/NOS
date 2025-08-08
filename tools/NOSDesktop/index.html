@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>NOS Desktop</title>
+  <link rel="stylesheet" type="text/css" href="jquery-easyui/themes/gray/easyui.css" />
+  <link rel="stylesheet" type="text/css" href="jquery-easyui/themes/icon.css" />
+  <link rel="stylesheet" type="text/css" href="desktop.css" />
+  <script type="text/javascript" src="jquery-easyui/jquery.min.js"></script>
+  <script type="text/javascript" src="jquery-easyui/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="jquery.desktop.js"></script>
+  <style>
+    @font-face {
+      font-family: "oswald";
+      src: url("lib/js/PressStart2P-vaV7.ttf");
+    }
+
+    .modal {
+      z-index: 99999 !important;
+    }
+
+    .modal-backdrop {
+      z-index: 99998 !important;
+    }
+  </style>
+
+  <script src="lib/js/cygRFC.js"></script>
+  <script src="lib/js/_timetravel.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+Mono:wght@100..900&family=Press+Start+2P&family=VT323&display=swap"
+    rel="stylesheet">
+
+
+  <link rel="stylesheet" href="lib/js/bootstrap/bootstrap.min.css" />
+  <script src="lib/js/bootstrap/bootstrap.bundle.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/lib/codemirror.css" />
+
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/theme/monokai.css" />
+  <script src="lib/js/codemirror-5.65.19/lib/codemirror.js"></script>
+  <script src="lib/js/codemirror-5.65.19/mode/javascript/javascript.js"></script>
+  <link rel="stylesheet" href="lib/js/codemirror-5.65.19/addon/fold/foldgutter.css">
+  <script src="lib/js/codemirror-5.65.19/addon/fold/xml-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/indent-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/markdown-fold.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/foldcode.js"></script>
+  <script src="lib/js/codemirror-5.65.19/addon/fold/foldgutter.js"></script>
+  <script src="lib/js/codemirror-5.65.19/keymap/sublime.js"></script>
+
+  <script src="lib/js/tinymce/tinymce.min.js"></script>
+  <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
+  <script src="node_modules/xterm/lib/xterm.js"></script>
+  <script src="node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+
+  <script src="./node_modules/chart.js/dist/chart.umd.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600,800,900" rel="stylesheet" type="text/css" />
+  <script src="lib/js/progressbar.js/dist/progressbar.min.js"></script>
+
+  <script src="lib/js/zinnia/zinnia.js"></script>
+
+  <!-- <script type="module">
+    import { Terminal } from "https://cdn.jsdelivr.net/npm/xterm@5.2.1/+esm";
+    import { FitAddon } from "https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/+esm";
+  </script> -->
+
+  <script type="text/javascript">
+    let NOSDesktopVersion = "1.1.0";
+    let ws, RFC;
+    let appList = [];
+    let launcherList = [];
+    let programsList = [];
+    function connect() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const wsaddress = urlParams.get("address");
+      let srcaddress = `ws://${wsaddress}`;
+      ws = new WebSocket(srcaddress);
+      ws.onopen = function () {
+        // console.log("Websocket connected!");
+
+        RFC = new cygRFC(ws);
+        window.RFC = RFC;
+
+        RFC.onmessage = function (data) {
+          // let clipData = data.data;
+          // console.log("Incoming: |"+JSON.stringify(data)+"|");
+          // let crtData = data.split(`\xf0`)[1];
+          // if (typeof crtData != "undefined") {
+          // crtData = crtData.replace(/\n/g, "\r\n");
+          // if (window.term) window.term.write(String.fromCharCode(parseInt(data)));
+          // if (window.term) window.term.write(Buffer.from(data.data, "base64"))
+          // }
+        };
+
+        RFC.callRFC = (name, params = [], callBack = {}) => {
+          RFC.remoteCall(
+            {
+              name: name,
+              params: params,
+            },
+            callBack
+          );
+        };
+
+        RFC.callRFC("desktop.getLaunchers", [], (ret) => {
+          let launcher;
+          if (typeof ret === "string" && ret.match(/^[A-Za-z0-9+/=]+$/)) {
+            launcher = JSON.parse(atob(ret));
+          } else return;
+          // console.log(atob(ret));
+
+          //launcher = JSON.parse(atob(ret));
+
+          launcher.forEach((l) => {
+            let appItem = {
+              id: !l.header?.appId ? l.header.appName : l.header.appId,
+              name: l.header.appName,
+              title: l.header.appTitle,
+              icon: null, // akan diisi async
+              width: l.header.width,
+              height: l.header.height,
+              showContentWhileDragging: !l.header?.showContentWhileDragging
+                ? true
+                : l.header?.showContentWhileDragging,
+              collapsible: !l.header?.collapsible
+                ? false
+                : l.header?.collapsible,
+              minimizable: !l.header?.minimizable
+                ? false
+                : l.header?.minimizable,
+              maximizable: !l.header?.maximizable
+                ? true
+                : l.header?.maximizable,
+              resizable: !l.header?.resizable ? false : l.header?.resizable,
+              left: 150 + Math.round(Math.random() * 100),
+              top: 50 + Math.round(Math.random() * 100),
+              onClick: (target, app) => {
+                return new Promise((resolve, reject) => {
+                  app.target = target;
+                  RFC.callRFC("desktop.getModule", [app.name], (ret) => {
+                    let { header, content, jsContent } = JSON.parse(atob(ret));
+                    app.title = header.appTitle;
+                    content = decodeURIComponent(content);
+                    content = content.replaceAll("$winmgr-version$", NOSDesktopVersion)
+                    jsContent = decodeURIComponent(jsContent);
+
+                    const appData = JSON.parse(atob(ret));
+                    /***********************************************************/
+                    appData.ngsLibCall = (methodName, params, cb) => {
+                      RFC.callRFC(`ngsLib.${methodName}`, params, (ret) => {
+                        const retJS = JSON.parse(atob(ret));
+                        if (typeof cb === "function") cb(retJS);
+                      });
+                    }
+                    appData.ngsLibCallAsync = (methodName, params) => {
+                      return new Promise((resolve, reject) => {
+                        RFC.callRFC(`ngsLib.${methodName}`, params, (ret) => {
+                          try {
+                            const retJS = JSON.parse(atob(ret));
+                            resolve(retJS);
+                          } catch (e) {
+                            reject(e);
+                          }
+                        });
+                      });
+                    }
+
+                    appData.loadRemoteImage = (imagePath, cb) => {
+                      RFC.callRFC("ngsLib.loadImage", [imagePath], (ret) => {
+                        const pic = JSON.parse(atob(ret));
+                        if (typeof cb === "function") cb(pic);
+                      });
+                    }
+                    appData.loadRemoteImageAsync = (imagePath) => {
+                      return new Promise((resolve, reject) => {
+                        RFC.callRFC("ngsLib.loadImage", [imagePath], (ret) => {
+                          try {
+                            const pic = JSON.parse(atob(ret));
+                            resolve(pic);
+                          } catch (e) {
+                            reject(e);
+                          }
+                        });
+                      });
+                    }
+
+                    appData.setRemoteImage = (imageObj, imgElement) => {
+                      imgElement.src = `data:${imageObj.imageMime};base64,${imageObj.imageData}`;
+                    };
+                    /***********************************************************/
+                    let win = $(`<div>${content}</div>`).appendTo(
+                      $(target).layout("panel", "center")
+                    );
+
+                    let jsContentError = 0;
+                    let errorMsg = "";
+                    try {
+                      const func = new Function("return " + jsContent)();
+                      func(appData);
+                    } catch (e) {
+                      errorMsg = e + "::" + e.stack;
+                      jsContentError = 1;
+                      RFC.callRFC(
+                        "desktop.jsContentError",
+                        [errorMsg, app.name, header.uuid],
+                        (ret) => { }
+                      );
+                      showNotif(
+                        `appName: ${app.name} [${app.title}] <br/>appUUID: ${header.uuid}` +
+                        `<br/>Error: ${errorMsg}<br/>` + errorMsg,
+                        "Application Error");
+                    }
+                    if (jsContentError != 0)
+                      console.log(`Error: ` + errorMsg);
+
+                    resolve(win);
+                  });
+                });
+              },
+            };
+            // Ambil icon dari NOS secara async
+            if (l.header.icon) {
+              RFC.callRFC("ngsLib.loadImage", [l.header.icon], (ret) => {
+                try {
+                  const pic = JSON.parse(atob(ret));
+                  appItem.icon = `data:${pic.imageMime};base64,${pic.imageData}`;
+                  // Update icon di desktop jika sudah di-render
+                  // Cari elemen desktop-app yang sesuai dengan appId/appName
+                  setTimeout(() => {
+                    // Cari semua elemen desktop-app
+                    document.querySelectorAll('.desktop-app').forEach((el) => {
+                      // Cek nama app di .desktop-app-name
+                      const nameEl = el.querySelector('.desktop-app-name');
+                      if (nameEl && nameEl.textContent.trim() === appItem.title) {
+                        const iconEl = el.querySelector('img.desktop-app-icon');
+                        if (iconEl) {
+                          iconEl.src = appItem.icon;
+                        }
+                      }
+                    });
+                  }, 100);
+                } catch (e) {
+                  // fallback: biarkan icon null
+                }
+              });
+            }
+            if (!appItem.name.startsWith("_")) {
+              launcherList.push(appItem);
+              programsList.push({
+                text: appItem.title,
+                handler: () => {
+                  $("body").desktop("openApp", appItem);
+                },
+              });
+            }
+            appList.push(appItem);
+          });
+
+          buildDesktop();
+        });
+
+        function getCurrentUser() {
+          // Ini bisa diambil dari localStorage atau parameter URL
+          return localStorage.getItem('nosUsername') || 'default';
+        }
+
+        RFC.callRFC("desktop.getProfile", [getCurrentUser()], (ret) => {
+          let profile;
+          try {
+            if (typeof ret === "string" && ret.match(/^[A-Za-z0-9+/=]+$/)) {
+              profile = JSON.parse(atob(ret));
+            } else {
+              console.error("Invalid profile data received");
+              return;
+            }
+
+            // if (profile.wallpaper && profile.wallpaper.data) {
+            //   $("body").desktop(
+            //     "setWallpaper",
+            //     `data:${profile.wallpaper.mime};base64,${profile.wallpaper.data}`
+            //   );
+            // }
+
+            // Apply theme if specified
+            // if (profile.theme) {
+            //   changeTheme(profile.theme);
+            // }
+
+            // Execute startup script if available
+            if (profile.startupScript) {
+              try {
+                // Execute with safety wrapper
+                const startupFunc = new Function("profile", "RFC", profile.startupScript);
+                startupFunc(profile, RFC);
+              } catch (e) {
+                console.error("Error executing startup script:", e);
+                showNotif(`Error executing startup script: ${e.message}`, "Startup Error");
+              }
+            }
+
+            // // Apply desktop settings
+            // if (profile.desktopSettings) {
+            //   applyDesktopSettings(profile.desktopSettings);
+            // }
+
+            // // Store profile in global variable for later use
+            // window.userProfile = profile;
+
+          } catch (e) {
+            console.error("Error processing profile:", e);
+            showNotif(`Error loading user profile: ${e.message}`, "Profile Error");
+          }
+        });
+      };
+
+      ws.onclose = function (e) {
+        console.log("Socket closed. Retry in 1s.", e.reason);
+        setTimeout(connect, 1000);
+      };
+
+      ws.onerror = function (err) {
+        console.error("WebSocket error: ", err.message);
+        ws.close();
+      };
+    }
+
+    $(function () {
+      $("#notifModal").modal({ backdrop: 'static', keyboard: false });
+      showNotif = function (message, title = "Notifikasi") {
+        $("#notifModalLabel").text(title);
+        $("#notifModalBody").html(message);
+        $('#notifModal').modal('show');
+      }
+      connect();
+
+      $(document).on('click', '.desktop-window', function () {
+        let topIndex = 0;
+        let topElement = null;
+        $(".desktop-window").each(function () {
+          const zindex = $(this).css('z-index');
+          if (topIndex < parseInt(zindex)) {
+            topElement = $(this);
+            topIndex = parseInt(zindex);
+          }
+        });
+        const thisZindex = parseInt($(this).css('z-index'))
+        if (topElement) topElement.css('z-index', thisZindex);
+        const windowPanel = $(this).css('z-index', topIndex)
+      });
+
+      // Handler tombol OK
+      $(document).on("click", "#notifModalOk", function () {
+        $("#notifModal").modal('hide');
+      });
+    });
+    settingsApp = null;
+
+    function buildDesktop() {
+      // $('body').html(`
+      // <div id="buttons">
+      // 	<a href="javascript:;" class="easyui-linkbutton" outline="true" plain="true" onclick="settings()">Settings</a>
+      // </div>`);
+      $("body").desktop({
+        apps: launcherList,
+        menus: [
+          {
+            text: "About NOS Desktop",
+            disabled: false,
+            handler: function () {
+              $("body").desktop(
+                "openApp",
+                appList.filter((x) => x.name == "_ndabout")[0]
+              );
+            },
+          },
+          {
+            text: "Programs",
+            menus: programsList,
+          },
+          {
+            text: "Desktop Settings",
+            handler: () => settings(),
+          },
+          {
+            disabled: true,
+            text: "Help",
+            iconCls: "icon-help",
+            handler: function () {
+              $("body").desktop("openApp", {
+                name: "Help",
+              });
+            },
+          },
+          {
+            disabled: true,
+            text: "Logout",
+            iconCls: "icon-lock",
+            handler: function () {
+              $.messager.confirm({
+                title: "Confirm",
+                msg: "Are you sure you want to logout?",
+                border: "thin",
+              });
+            },
+          },
+        ],
+        buttons: "#buttons",
+      });
+    }
+
+    function settings() {
+      if (settingsApp) {
+        $("body").desktop("openApp", settingsApp);
+        return;
+      }
+      settingsApp = {
+        id: "settings",
+        name: "Settings",
+        width: 600,
+        height: 400,
+        onBeforeClose: function () {
+          settingsApp = null;
+        },
+      };
+      $("body").desktop("openApp", settingsApp);
+      var template =
+        "<div>" +
+        '<div region="north" style="padding:5px;height:45px;text-align:right"></div>' +
+        '<div region="south" style="text-align:right;height:45px;padding:5px"></div>' +
+        '<div region="west" title="Background" split="true" style="width:200px"><table id="settings-dl"></table></div>' +
+        '<div region="center" title="Preview"><img id="settings-img" style="border:0;width:100%;height:100%"></div>' +
+        "</div>";
+      var layout = $(template).appendTo("#settings");
+      layout.layout({
+        fit: true,
+      });
+      var combo = $("<input>").appendTo(layout.layout("panel", "north"));
+      combo.combobox({
+        data: [
+          { value: "default", text: "Default", group: "Base" },
+          { value: "gray", text: "Gray", group: "Base" },
+          { value: "metro", text: "Metro", group: "Base" },
+          { value: "material", text: "Material", group: "Base" },
+          { value: "material-teal", text: "Material Teal", group: "Base" },
+          { value: "bootstrap", text: "Bootstrap", group: "Base" },
+          { value: "black", text: "Black", group: "Base" },
+        ],
+        width: 300,
+        label: "Themes: ",
+        value: "gray",
+        editable: false,
+        panelHeight: "auto",
+        onChange: function (theme) {
+          var link = $("head").find("link:first");
+          link.attr(
+            "href",
+            "https://www.jeasyui.com/easyui/themes/" + theme + "/easyui.css"
+          );
+        },
+      });
+      $("#settings-dl").datalist({
+        fit: true,
+        data: [
+          { text: "NOS 1", img: "images/wallpaper/NOS-wallp4.png" },
+          { text: "NOS 2", img: "images/wallpaper/NOS-wallp2.png" },
+          { text: "NOS 3", img: "images/wallpaper/NOS-wallp3.png" },
+          { text: "Desktop", img: "images/wallpaper/bg.jpg" },
+          { text: "Desktop2", img: "images/wallpaper/bg2.jpg" },
+          { text: "Desktop3", img: "images/wallpaper/bg3.jpg" },
+        ],
+        onLoadSuccess: function () {
+          $(this).datalist("selectRow", 0);
+        },
+        onSelect(index, row) {
+          $("#settings-img").attr("src", row.img);
+        },
+      });
+      $('<a style="margin-right:10px"></a>')
+        .appendTo(layout.layout("panel", "south"))
+        .linkbutton({
+          text: "Ok",
+          width: 80,
+          onClick: function () {
+            $("body").desktop(
+              "setWallpaper",
+              $("#settings-dl").datalist("getSelected").img
+            );
+            $("#settings").window("close");
+          },
+        });
+      $("<a></a>")
+        .appendTo(layout.layout("panel", "south"))
+        .linkbutton({
+          text: "Cancel",
+          width: 80,
+          onClick: function () {
+            $("#settings").window("close");
+          },
+        });
+    }
+  </script>
+</head>
+
+<body>
+  <div class="modal fade" id="notifModal" tabindex="-1" aria-labelledby="notifModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notifModalLabel">Notifikasi</h5>
+        </div>
+        <div class="modal-body" id="notifModalBody">
+          <!-- Pesan notifikasi akan diisi lewat JS -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="notifModalOk">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
