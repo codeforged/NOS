@@ -21,6 +21,7 @@ Sekuriti di NOS ditangani oleh **security agent** dimana komponen ini bertanggun
 Seperti yang disebutkan sebelumnya pada dasarnya NOS didesain dengan pendekatan yang modular, setiap komponen dibagi kedalam banyak file script terpisah sesuai dengan fungsi dan tugasnya. Singkatnya NOS memiliki filosofi: **“Do it one thing and do it well”**, ya memang meniru filisofinya UNIX. Ini menjadi penting sekali dalam pengembangan sistem yang scalable dan terus berkembang tetapi dengan tetap memperhatikan mitigasi dimana ada konflik atau bug kita bisa dengan mudah memilah area mana yang berpotensi bermasalah dan melakukan isolasi dalam proses tracing dan debuging.
 
 ![Arsitektur Komunikasi di NOS](docs/arsitektur-mqtnl.jpg)
+Catatan: untuk transport layer TCP/IP dan LoRa belum diimplementasi.
 
 ---
 
@@ -78,3 +79,7 @@ Langkah-langkat instalasi:
 
 	untuk keluar dari NOS berikan perintah di shell command:
 	`shutdown`
+
+---
+
+Kami sangat menyambut kontribusi Anda! Baik Anda seorang developer pemula maupun veteran, ide dan feedback Anda sangat berharga bagi kami.
