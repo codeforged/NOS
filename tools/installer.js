@@ -3,29 +3,42 @@ const path = require("path");
 const readline = require("readline");
 const { NOSFileSystemDriver } = require("./bfs.js");
 const crypto = require("crypto");
-const prompt = require('prompt-sync')({ sigint: true });
+const prompt = require("prompt-sync")({ sigint: true });
 
 // Helper prompt user
 function ask(question, defaultValue = "", echo = true) {
   if (!echo) {
     // Gunakan prompt-sync untuk input password tanpa echo
     let q = question;
-    if (defaultValue) q += `[${defaultValue}]: `; else q += ': ';
+    if (defaultValue) q += `[${defaultValue}]: `;
+    else q += ": ";
     const ans = prompt.hide(q);
     return Promise.resolve(ans || defaultValue);
   } else {
     let ret = "";
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
     if (defaultValue) {
       question += `[${defaultValue}]: `;
     } else {
       question += ": ";
     }
     if (defaultValue) {
-      ret = new Promise(resolve => rl.question(question, ans => { rl.close(); resolve(ans || defaultValue); }));
-    }
-    else {
-      ret = new Promise(resolve => rl.question(question, ans => { rl.close(); resolve(ans); }));
+      ret = new Promise((resolve) =>
+        rl.question(question, (ans) => {
+          rl.close();
+          resolve(ans || defaultValue);
+        })
+      );
+    } else {
+      ret = new Promise((resolve) =>
+        rl.question(question, (ans) => {
+          rl.close();
+          resolve(ans);
+        })
+      );
     }
     return ret;
   }
@@ -39,6 +52,10 @@ function hashPassword(pw) {
 
 // Fungsi migrasi file ke BFS
 function migrateFileToBFS(bfs, localFile, bfsFilePath) {
+  // Skip .DS_Store files
+  if (path.basename(localFile) === ".DS_Store") {
+    return;
+  }
   const data = fs.readFileSync(localFile);
   bfs.writeFileSync(bfsFilePath, data);
   console.log(`Migrated file: ${bfsFilePath}`);
@@ -51,6 +68,7 @@ function migrateFolderToBFS(bfs, localDir, bfsDir) {
   }
   const items = fs.readdirSync(localDir, { withFileTypes: true });
   for (const item of items) {
+    if (item.name === ".DS_Store") continue; // Skip .DS_Store
     const localPath = path.join(localDir, item.name);
     const bfsPath = path.posix.join(bfsDir, item.name);
     if (item.isDirectory()) {
@@ -126,7 +144,9 @@ function migrateFolderToBFS(bfs, localDir, bfsDir) {
     console.error("sysconfig.js tidak ditemukan di BFS!");
     process.exit(1);
   }
-  const sysconfigRaw = bfs.readFileSync(sysconfigPath, { "encoding": "utf8" }).toString("utf8");
+  const sysconfigRaw = bfs
+    .readFileSync(sysconfigPath, { encoding: "utf8" })
+    .toString("utf8");
   // console.log("sysconfigRaw: " + sysconfigRaw);
   let sysconfig = {};
   try {
@@ -138,14 +158,16 @@ function migrateFolderToBFS(bfs, localDir, bfsDir) {
 
   sysconfig.hostName = hostName;
   if (sysconfig.rshLogin && Array.isArray(sysconfig.rshLogin.users)) {
-    sysconfig.rshLogin.users = sysconfig.rshLogin.users.map(u =>
+    sysconfig.rshLogin.users = sysconfig.rshLogin.users.map((u) =>
       u.username === "root" ? { ...u, password: hashPassword(rootPassword) } : u
     );
   }
   if (sysconfig.shell) sysconfig.shell.needLogin = parseInt(shellLogin) ? 1 : 0;
-  if (sysconfig.remoteShell) sysconfig.remoteShell.needLogin = parseInt(remoteShellLogin) ? 1 : 0;
+  if (sysconfig.remoteShell)
+    sysconfig.remoteShell.needLogin = parseInt(remoteShellLogin) ? 1 : 0;
 
-  const newSysconfig = "module.exports = " + JSON.stringify(sysconfig, null, 2) + ";\n";
+  const newSysconfig =
+    "module.exports = " + JSON.stringify(sysconfig, null, 2) + ";\n";
   bfs.writeFileSync(sysconfigPath, newSysconfig, "utf8");
   console.log("Konfigurasi sysconfig.js berhasil diupdate!");
 

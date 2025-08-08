@@ -17,7 +17,9 @@ if (!targetPath) {
   const rootPrefix = "/src";
   const idx = source.indexOf(rootPrefix);
   if (idx === -1) {
-    console.error("Error: Source file must be under /src if targetPath is omitted!");
+    console.error(
+      "Error: Source file must be under /src if targetPath is omitted!"
+    );
     process.exit(1);
   }
   // Path setelah /home/bfsnos/root, tanpa nama file
@@ -36,6 +38,10 @@ if (!bfs.existsSync(targetPath)) {
 
 // 3. Fungsi migrasi file
 function migrateFileToBFS(localFile, bfsFilePath) {
+  // Skip .DS_Store files
+  if (path.basename(localFile) === ".DS_Store") {
+    return;
+  }
   const data = fs.readFileSync(localFile);
   bfs.writeFileSync(bfsFilePath, data);
   console.log(`Migrated file: ${bfsFilePath}`);
@@ -48,6 +54,7 @@ function migrateFolderToBFS(localDir, bfsDir) {
   }
   const items = fs.readdirSync(localDir, { withFileTypes: true });
   for (const item of items) {
+    if (item.name === ".DS_Store") continue; // Skip .DS_Store
     const localPath = path.join(localDir, item.name);
     const bfsPath = path.posix.join(bfsDir, item.name);
     if (item.isDirectory()) {
