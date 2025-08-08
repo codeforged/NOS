@@ -1,0 +1,5 @@
+# Abaikan file .DS_Store di semua folder
+.DS_Store
+
+# Abaikan folder node_modules di semua folder
+node_modules/
