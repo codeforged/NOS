@@ -1,19 +1,12 @@
 #include <Arduino.h>
 #include <noslib.h>
 
-// === Konfigurasi ===
-#define WIFI_SSID "BabamGo"
-#define WIFI_PASSWORD "bismillah"
-// #define MQTT_SERVER "62.72.31.252"
+#define WIFI_SSID "<YoutWiFiSSID>"
+#define WIFI_PASSWORD "YourWiFiPassword"
 #define MQTT_SERVER "192.168.0.105"
 #define MQTT_PORT 1883
 
-// Kunci enkripsi 256-bit (32 bytes)
-char key[KEY_SIZE] = {
-    0x81, 0xFF, 0x71, 0xED, 0x57, 0x4E, 0x54, 0x59,
-    0x76, 0x90, 0xAE, 0x7B, 0x04, 0xE4, 0xEF, 0x5F,
-    0xC8, 0x74, 0x97, 0xFE, 0x10, 0xB6, 0xB0, 0x37,
-    0xCB, 0x03, 0x1A, 0xF7, 0xC7, 0xD6, 0x76, 0x19};
+char key[KEY_SIZE] = {<Your 32 byte Chacha20 Key>};
 
 // === Inisialisasi NOS ===
 NOS nos("ESP32MultiSensorDec", 100, key, MQTT_SERVER, MQTT_PORT);
