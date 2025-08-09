@@ -76,21 +76,42 @@
         { "src": "/lib/beeNetClient.js", "dst": "/lib/beeNetClient.js" },
         { "src": "/lib/encryption_core.js", "dst": "/lib/encryption_core.js" },
         { "src": "/lib/mqttNetworkLib.js", "dst": "/lib/mqttNetworkLib.js" },
-        { "src": "/lib/NOSPacketStackV2.js", "dst": "/lib/NOSPacketStackV2.js" },
+        {
+          "src": "/lib/NOSPacketStackV2.js",
+          "dst": "/lib/NOSPacketStackV2.js"
+        },
         { "src": "/lib/nto-mgr.js", "dst": "/lib/nto-mgr.js" },
         { "src": "/lib/packetFlags.js", "dst": "/lib/packetFlags.js" },
         { "src": "/lib/pkglib.js", "dst": "/lib/pkglib.js" },
         { "src": "/lib/sacredPhrases.js", "dst": "/lib/sacredPhrases.js" },
-        { "src": "/lib/sysconfigFormatter.js", "dst": "/lib/sysconfigFormatter.js" },
+        {
+          "src": "/lib/sysconfigFormatter.js",
+          "dst": "/lib/sysconfigFormatter.js"
+        },
         { "src": "/lib/texteditor.js", "dst": "/lib/texteditor.js" },
 
         { "src": "/opt/airterm.js", "dst": "/opt/airterm.js" },
         { "src": "/opt/airtermd.js", "dst": "/opt/airtermd.js" },
-        { "src": "/opt/crypto/cryptography/aes-agent.js", "dst": "/opt/crypto/cryptography/aes-agent.js" },
-        { "src": "/opt/crypto/cryptography/chacha20poly.js", "dst": "/opt/crypto/cryptography/chacha20poly.js" },
-        { "src": "/opt/crypto/cryptography/none-encryption.js", "dst": "/opt/crypto/cryptography/none-encryption.js" },
-        { "src": "/opt/crypto/cryptography/rsa-agent.js", "dst": "/opt/crypto/cryptography/rsa-agent.js" },
-        { "src": "/opt/crypto/getfingerprint.js", "dst": "/opt/crypto/getfingerprint.js" },
+        {
+          "src": "/opt/crypto/cryptography/aes-agent.js",
+          "dst": "/opt/crypto/cryptography/aes-agent.js"
+        },
+        {
+          "src": "/opt/crypto/cryptography/chacha20poly.js",
+          "dst": "/opt/crypto/cryptography/chacha20poly.js"
+        },
+        {
+          "src": "/opt/crypto/cryptography/none-encryption.js",
+          "dst": "/opt/crypto/cryptography/none-encryption.js"
+        },
+        {
+          "src": "/opt/crypto/cryptography/rsa-agent.js",
+          "dst": "/opt/crypto/cryptography/rsa-agent.js"
+        },
+        {
+          "src": "/opt/crypto/getfingerprint.js",
+          "dst": "/opt/crypto/getfingerprint.js"
+        },
         { "src": "/opt/ft.js", "dst": "/opt/ft.js" },
         { "src": "/opt/ftd.js", "dst": "/opt/ftd.js" },
         { "src": "/opt/historylogger.js", "dst": "/opt/historylogger.js" },
@@ -101,7 +122,7 @@
         { "src": "/opt/scpd.js", "dst": "/opt/scpd.js" },
         { "src": "/opt/securityagent.js", "dst": "/opt/securityagent.js" },
         { "src": "/opt/pfp.js", "dst": "/opt/pfp.js" },
-        { "src": "/opt/pkg-signer.js", "dst": "/opt/pkg-signer.js" },        
+        { "src": "/opt/pkg-signer.js", "dst": "/opt/pkg-signer.js" },
         { "src": "/opt/pkg-verify.js", "dst": "/opt/pkg-verify.js" },
         { "src": "/opt/scheduler.js", "dst": "/opt/scheduler.js" },
         { "src": "/opt/forwarder.js", "dst": "/opt/forwarder.js" }
@@ -115,18 +136,38 @@
       "active": true,
       "items": [
         { "src": "/opt/nos-desktop.js", "dst": "/opt/nos-desktop.js" },
-        { "src": "/opt/gui/services/ngslib.js", "dst": "/opt/gui/services/ngslib.js" },
-        { "src": "/opt/gui/apps/testngslib.js", "dst": "/opt/gui/apps/testngslib.js" },
-        { "src": "/opt/gui/script/default-startup.js", "dst": "/opt/gui/script/default-startup.js" },
-        { "src": "/opt/gui/wallpapers/default.png", "dst": "/opt/gui/wallpapers/default.png" },
-        { "src": "/opt/gui/conf/default.json", "dst": "/opt/gui/conf/default.json" },
+        {
+          "src": "/opt/gui/services/ngslib.js",
+          "dst": "/opt/gui/services/ngslib.js"
+        },
+        {
+          "src": "/opt/gui/apps/testngslib.js",
+          "dst": "/opt/gui/apps/testngslib.js"
+        },
+        {
+          "src": "/opt/gui/script/default-startup.js",
+          "dst": "/opt/gui/script/default-startup.js"
+        },
+        {
+          "src": "/opt/gui/wallpapers/default.png",
+          "dst": "/opt/gui/wallpapers/default.png"
+        },
+        {
+          "src": "/opt/gui/conf/default.json",
+          "dst": "/opt/gui/conf/default.json"
+        },
         { "src": "/opt/create-gui-app.js", "dst": "/opt/create-gui-app.js" },
         { "src": "/opt/gui/apps/_about.js", "dst": "/opt/gui/apps/_about.js" },
         { "src": "/opt/gui/apps/term.js", "dst": "/opt/gui/apps/term.js" },
-        { "src": "/opt/gui/apps/nettopgui.js", "dst": "/opt/gui/apps/nettopgui.js" },
+        {
+          "src": "/opt/gui/apps/nettopgui.js",
+          "dst": "/opt/gui/apps/nettopgui.js"
+        },
         { "src": "/opt/gui/apps/gcoder.js", "dst": "/opt/gui/apps/gcoder.js" },
-        { "src": "/opt/gui/apps/allsensor.js", "dst": "/opt/gui/apps/allsensor.js" }
-
+        {
+          "src": "/opt/gui/apps/senslitedashboard.js",
+          "dst": "/opt/gui/apps/senslitedashboard.js"
+        }
       ]
     },
     {
@@ -137,9 +178,18 @@
       "active": true,
       "items": [
         { "src": "/opt/gui/apps/mybulb.js", "dst": "/opt/gui/apps/mybulb.js" },
-        { "src": "/opt/gui/images/layoutrumah.png", "dst": "/opt/gui/images/layoutrumah.png" },
-        { "src": "/opt/gui/images/bulbon.png", "dst": "/opt/gui/images/bulbon.png" },
-        { "src": "/opt/gui/images/bulboff.png", "dst": "/opt/gui/images/bulboff.png" }
+        {
+          "src": "/opt/gui/images/layoutrumah.png",
+          "dst": "/opt/gui/images/layoutrumah.png"
+        },
+        {
+          "src": "/opt/gui/images/bulbon.png",
+          "dst": "/opt/gui/images/bulbon.png"
+        },
+        {
+          "src": "/opt/gui/images/bulboff.png",
+          "dst": "/opt/gui/images/bulboff.png"
+        }
       ]
     },
     {
@@ -148,11 +198,20 @@
       "version": "1.0.0",
       "author": "K1ngUn1c0rn🦄",
       "active": true,
-      "items": [        
+      "items": [
         { "src": "/opt/gui/apps/snake.js", "dst": "/opt/gui/apps/snake.js" },
-        { "src": "/opt/gui/apps/tictactoe.js", "dst": "/opt/gui/apps/tictactoe.js" },
-        { "src": "/opt/gui/apps/spaceinvader.js", "dst": "/opt/gui/apps/spaceinvader.js" },
-        { "src": "/opt/gui/images/icon/GW.png", "dst": "/opt/gui/images/icon/GW.png" }
+        {
+          "src": "/opt/gui/apps/tictactoe.js",
+          "dst": "/opt/gui/apps/tictactoe.js"
+        },
+        {
+          "src": "/opt/gui/apps/spaceinvader.js",
+          "dst": "/opt/gui/apps/spaceinvader.js"
+        },
+        {
+          "src": "/opt/gui/images/icon/GW.png",
+          "dst": "/opt/gui/images/icon/GW.png"
+        }
       ]
     },
     {
@@ -162,17 +221,50 @@
       "author": "K1ngUn1c0rn🦄",
       "active": true,
       "items": [
-        { "src": "/opt/gui/images/icon/app-icon.jpg", "dst": "/opt/gui/images/icon/app-icon.jpg" },
-        { "src": "/opt/gui/images/icon/GW.png", "dst": "/opt/gui/images/icon/GW.png" },
-        { "src": "/opt/gui/images/icon/icon_32_chart.png", "dst": "/opt/gui/images/icon/icon_32_chart.png" },
-        { "src": "/opt/gui/images/icon/icon_32_computer.png", "dst": "/opt/gui/images/icon/icon_32_computer.png" },
-        { "src": "/opt/gui/images/icon/icon_32_disc.png", "dst": "/opt/gui/images/icon/icon_32_disc.png" },
-        { "src": "/opt/gui/images/icon/icon_32_drive.png", "dst": "/opt/gui/images/icon/icon_32_drive.png" },
-        { "src": "/opt/gui/images/icon/icon_32_editor.png", "dst": "/opt/gui/images/icon/icon_32_editor.png" },
-        { "src": "/opt/gui/images/icon/icon_32_network.png", "dst": "/opt/gui/images/icon/icon_32_network.png" },
-        { "src": "/opt/gui/images/icon/icon_32_paint.png", "dst": "/opt/gui/images/icon/icon_32_paint.png" },
-        { "src": "/opt/gui/images/icon/icon_32_terminal.png", "dst": "/opt/gui/images/icon/icon_32_terminal.png" },
-        { "src": "/opt/gui/images/icon/icon-terminal.png", "dst": "/opt/gui/images/icon/icon-terminal.png" }
+        {
+          "src": "/opt/gui/images/icon/app-icon.jpg",
+          "dst": "/opt/gui/images/icon/app-icon.jpg"
+        },
+        {
+          "src": "/opt/gui/images/icon/GW.png",
+          "dst": "/opt/gui/images/icon/GW.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_chart.png",
+          "dst": "/opt/gui/images/icon/icon_32_chart.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_computer.png",
+          "dst": "/opt/gui/images/icon/icon_32_computer.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_disc.png",
+          "dst": "/opt/gui/images/icon/icon_32_disc.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_drive.png",
+          "dst": "/opt/gui/images/icon/icon_32_drive.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_editor.png",
+          "dst": "/opt/gui/images/icon/icon_32_editor.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_network.png",
+          "dst": "/opt/gui/images/icon/icon_32_network.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_paint.png",
+          "dst": "/opt/gui/images/icon/icon_32_paint.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon_32_terminal.png",
+          "dst": "/opt/gui/images/icon/icon_32_terminal.png"
+        },
+        {
+          "src": "/opt/gui/images/icon/icon-terminal.png",
+          "dst": "/opt/gui/images/icon/icon-terminal.png"
+        }
       ]
     },
     {
@@ -184,7 +276,10 @@
       "items": [
         { "src": "/opt/nto-acquirer.js", "dst": "/opt/nto-acquirer.js" },
         { "src": "/opt/nto-dispatcher.js", "dst": "/opt/nto-dispatcher.js" },
-        { "src": "/opt/conf/senslite-server.json", "dst": "/opt/conf/senslite-server.json" }
+        {
+          "src": "/opt/conf/senslite-server.json",
+          "dst": "/opt/conf/senslite-server.json"
+        }
       ]
     },
     {
@@ -194,8 +289,14 @@
       "author": "K1ngUn1c0rn🦄",
       "active": true,
       "items": [
-        { "src": "/opt/gui/apps/senslitedashboard.js", "dst": "/opt/gui/apps/senslitedashboard.js" },
-        { "src": "/opt/conf/senslite-client.json", "dst": "/opt/conf/senslite-client.json" }
+        {
+          "src": "/opt/gui/apps/senslitedashboard.js",
+          "dst": "/opt/gui/apps/senslitedashboard.js"
+        },
+        {
+          "src": "/opt/conf/senslite-client.json",
+          "dst": "/opt/conf/senslite-client.json"
+        }
       ]
     }
   ]
