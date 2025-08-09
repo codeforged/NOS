@@ -81,6 +81,11 @@ Langkah-langkat instalasi:
 	untuk keluar dari NOS berikan perintah di shell command:
 	`shutdown`
 
+ Opening Screen:
+ 
+ ![Opening Screen](docs/opening-screen.png)
+ 
+
 ---
 
 Kami sangat menyambut kontribusi Anda! Baik Anda seorang developer pemula maupun veteran, ide dan feedback Anda sangat berharga bagi kami.
