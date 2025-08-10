@@ -4,9 +4,8 @@ __APP.transportLayer = {
     {
       name: "mqtt",
       lib: require("mqtt"),
-      ip: "mqtt://192.168.0.105",
-      // ip: "mqtt://62.72.31.252",
-      // ip: "mqtt://broker.hivemq.com",
+      // ip: "mqtt://192.168.0.105",
+      ip: "mqtt://broker.hivemq.com",
       // ip: "mqtt://broker.emqx.io",
       // ip: "mqtt://localhost",
       port: 1883,
