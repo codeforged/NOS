@@ -20,10 +20,10 @@ module.exports = [
   "Red Hat bilang: 'Enterprise ready!' NOS jawab: 'Rumahan aja cukup.'",
   "Arch: 'Saya rolling release.' NOS: 'Saya rolling di rak server homemade.'",
   "Debian butuh 4GB RAM buat idle, NOS cuma butuh niat dan kopi sachet.",
-  "Ubuntu butuh ISO 2GB. NOS cukup copy script 300KB ke STB.",
+  "Ubuntu butuh ISO 2GB. NOS cukup copy script 500KB ke STB.",
   "Container? Kami tinggal di STB, bukan di Docker.",
-  "Orang lain pasang Prometheus buat monitoring. NOS cukup pakai log dan feeling.",
-  "Fedora bangga dengan Wayland. NOS bangga dengan websocket.",
+  "Orang lain pasang Prometheus buat monitoring. NOS cukup pakai log dan nettop.",
+  "Fedora bangga dengan Wayland. NOS bangga dengan NOS Desktop.",
   "GNOME pakai tracker buat indexing. NOS pakai insting.",
 
   // 🧙‍♂️ Pakde Linux dan kawan-kawan
