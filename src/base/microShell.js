@@ -1,9 +1,9 @@
-/* * * * * 
-*  MicroShell - A simple shell implementation for BFS NOS
-*  Version: 0.06  
-*  Author: K1ngUn1c0rn
-*  License: MIT
-* * * * */
+/* * * * *
+ *  MicroShell - A simple shell implementation for BFS NOS
+ *  Version: 0.06
+ *  Author: K1ngUn1c0rn
+ *  License: MIT
+ * * * * */
 
 const basicShell = bfs.require("/base/basicShell");
 
@@ -13,7 +13,7 @@ class CustomShell extends basicShell.Shell {
     super(prompt, title, nos, transmitData, authentication);
     this.#nos = nos;
     this._pipeContextStack = []; // Stack untuk buffer & transmit context
-    this.version = "microShell 0.08";
+    this.version = "microShell 0.081";
   }
 
   async shellHandler(lastCmd, isFromPipe = false) {
@@ -173,7 +173,10 @@ class CustomShell extends basicShell.Shell {
       }
       this.crt.write(inputData);
       this.promptVisible = true;
-      this.showPrompt();
+      // setTimeout(() => {
+      //   this.showPrompt();
+      // }, 250);
+
       return;
     }
     // Jalankan tahap pipeline berikutnya, tunggu jika async
@@ -198,7 +201,7 @@ class CustomShell extends basicShell.Shell {
       commands,
       this.lineBuffer,
       index + 1,
-      doneCallback,
+      doneCallback
     );
   }
 }

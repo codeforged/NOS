@@ -15,6 +15,8 @@ module.exports = function (envParams) {
     bfs.require(`/opt/crypto/cryptography/none-encryption`).noneEncryption;
   const reverseEncryption =
     bfs.require(`/opt/crypto/cryptography/none-encryption`).reverseEncryption;
+  const salsa20Agent = bfs.require(`/opt/crypto/cryptography/salsa20`);
+  const speckAgent = bfs.require(`/opt/crypto/cryptography/speck`);
 
   // Register semua agent class
   envParams.nos.__CORE.encryption.registerEncryption(AES256Agent);
@@ -22,6 +24,8 @@ module.exports = function (envParams) {
   envParams.nos.__CORE.encryption.registerEncryption(RSAAgent);
   envParams.nos.__CORE.encryption.registerEncryption(noneEncryption);
   envParams.nos.__CORE.encryption.registerEncryption(reverseEncryption);
+  envParams.nos.__CORE.encryption.registerEncryption(salsa20Agent);
+  envParams.nos.__CORE.encryption.registerEncryption(speckAgent);
 
   // create instance encryption
   envParams.nos.__CORE.encryption.addInstance("AES256", "AES256", "Bismillah411");
