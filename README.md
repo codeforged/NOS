@@ -1,6 +1,6 @@
 # NOS (Node-Oriented System)
 
-NOS (Singkatan dari Node-Oriented System) adalah sebuah platform scripting modular untuk IoT dan otomasi, NOS berbasis NodeJS tetapi seluruh script, komponen, library dan modulnya disimpan kedalam bentuk file tunggal semacam virtual file system (untuk selanjutnya kita sebut saja BFS) berbasis SQLite.
+NOS (Singkatan dari Node-Oriented System) adalah sebuah platform scripting modular untuk IoT dan otomasi, NOS berbasis NodeJS tetapi seluruh script, komponen, library dan modulnya disimpan kedalam bentuk file tunggal semacam virtual file system (dengan nama BFS) berbasis SQLite.
 
 NOS memliki semacam terminal untuk mengakses shell yang disediakan, terminal ini adalah antarmuka utama dengan user untuk melakukan beberapa operasi seperti menjalankan script, operasi file (ls, cp, cat, rm dsb), mengatur konfigurasi, memeriksa log dan lainnya.
 
