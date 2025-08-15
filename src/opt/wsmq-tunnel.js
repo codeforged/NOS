@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 module.exports = {
   name: "wsmq-tunnel",
-  version: "0.3",
+  version: "0.5",
   needRoot: true,
   main: function (nos) {
     // Store nos reference for use in other methods
@@ -30,9 +30,11 @@ module.exports = {
     // Initialize MQTNL connection
     this.conn = new this.mqtnl.mqtnlConnection(
       this.mqtnl.connMgr,
-      port,
-      null,
       isServer
+        ? port
+        : this.mqtnl.connMgr.ports.allocateRandomPort(1000, 65000),
+      null,
+      true
     );
 
     // Initialize secure stack
@@ -58,7 +60,7 @@ module.exports = {
     const rsaKeyPair = { publicKey, privateKey };
 
     // Track authenticated clients
-    this.authenticatedClients = new Set();
+    this.authenticatedClients = new Map();
 
     // Handle key exchange success
     const onKeyExchangeSuccess = (sharedKey, client) => {
@@ -112,7 +114,51 @@ module.exports = {
           if (user && passOk) {
             authed = true;
             const clientKey = `${src.address}:${src.port}`;
-            self.authenticatedClients.add(clientKey);
+
+            // Check if same address already exists, remove old connection
+            const oldConnections = [];
+            for (const [key, info] of self.authenticatedClients) {
+              if (info.address === src.address) {
+                oldConnections.push(key);
+              }
+            }
+
+            // Cleanup old connections from same address
+            oldConnections.forEach((oldKey) => {
+              const oldInfo = self.authenticatedClients.get(oldKey);
+              if (oldInfo) {
+                // Remove old WebSocket listener
+                delete self.ws.directTXListener[
+                  `wsmq-tunnel-${oldInfo.session.id}`
+                ];
+                self.authenticatedClients.delete(oldKey);
+                self.crt.textOut(
+                  `🗑️ Removed old connection from ${oldInfo.address}:${oldInfo.port}`
+                );
+              }
+            });
+
+            self.authenticatedClients.set(clientKey, {
+              address: src.address,
+              port: src.port,
+              session: session,
+              timestamp: Date.now(),
+            });
+
+            // Create unique WebSocket listener per session
+            self.ws.directTXListener[`wsmq-tunnel-${session.id}`] = (raw) => {
+              if (authed) {
+                try {
+                  self.stack.send(src, raw.toString());
+                } catch (e) {
+                  // Connection dead, cleanup
+                  delete self.ws.directTXListener[`wsmq-tunnel-${session.id}`];
+                  self.authenticatedClients.delete(clientKey);
+                  self.crt.textOut(`🗑️ Removed dead client: ${clientKey}`);
+                }
+              }
+            };
+
             self.stack.send(src, JSON.stringify({ type: "auth_ok" }));
             self.crt.textOut(
               `✅ Client ${src.address}:${src.port} authenticated successfully`
@@ -147,21 +193,24 @@ module.exports = {
           self.ws._read(payload, self.ws);
         }
       });
+
+      // Add session cleanup handler
+      this.stack.onDestroy(client, () => {
+        const clientKey = `${client.address}:${client.port}`;
+        if (self.authenticatedClients.has(clientKey)) {
+          const clientInfo = self.authenticatedClients.get(clientKey);
+          // Remove WebSocket listener
+          delete self.ws.directTXListener[
+            `wsmq-tunnel-${clientInfo.session.id}`
+          ];
+          self.authenticatedClients.delete(clientKey);
+          self.crt.textOut(`🗑️ Cleaned up session for ${clientKey}`);
+        }
+      });
     };
 
     // Setup server-side key exchange
     this.stack.negotiateKeyExchangeAsServer(rsaKeyPair, onKeyExchangeSuccess);
-
-    // Handle WebSocket messages -> MQTNL (encrypt)
-    this.ws.directTXListener["wsmq-tunnel"] = (raw) => {
-      // Find authenticated session to forward to
-      for (const clientKey of this.authenticatedClients) {
-        const [address, port] = clientKey.split(":");
-        const dst = { address, port: parseInt(port) };
-        this.stack.send(dst, raw.toString());
-        break; // Send to first authenticated client
-      }
-    };
   },
 
   async setupSecureClient(peer, port) {
