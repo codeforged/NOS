@@ -1,9 +1,9 @@
-/* * * * * 
-*  basicShell - A basic class shell implementation for BFS NOS
-*  Version: 0.06  
-*  Author: K1ngUn1c0rn
-*  License: MIT
-* * * * */
+/* * * * *
+ *  basicShell - A basic class shell implementation for BFS NOS
+ *  Version: 0.06
+ *  Author: K1ngUn1c0rn
+ *  License: MIT
+ * * * * */
 
 const { TermUtil } = bfs.require("/base/termUtil");
 const path = require("path");
@@ -16,7 +16,9 @@ function nosPath(...args) {
   }
 }
 
-const { shell } = bfs.require(isWin ? nosPath("opt", "conf", "sysconfig") : "/opt/conf/sysconfig");
+const { shell } = bfs.require(
+  isWin ? nosPath("opt", "conf", "sysconfig") : "/opt/conf/sysconfig"
+);
 const crypto = require("crypto");
 
 class Shell {
@@ -25,7 +27,7 @@ class Shell {
   constructor(prompt = ">", title, nos, transmitData, authentication = false) {
     this.#nos = nos;
     this.pathLib = path;
-    this.version = "basicShell 0.08";
+    this.version = "basicShell 0.09";
     this.prompt = prompt;
     this.transmitData = transmitData;
     this.origTransmitData = this.transmitData;
@@ -50,6 +52,7 @@ class Shell {
     this.rootActive = false;
     this.interruptSignalListener = [];
     this.promptVisible = true;
+    this.requestShowprompt = true;
     this.id = crypto.randomUUID();
     this.syslog = nos.getDevice("syslogger");
     this.nimbus = nos.getDevice("nimbus");
@@ -84,7 +87,7 @@ class Shell {
     };
 
     this.syslog.append(
-      `New shell spawn at ${this.crt.rows}:${this.crt.columns} (Rows:Cols)`,
+      `New shell spawn at ${this.crt.rows}:${this.crt.columns} (Rows:Cols)`
     );
 
     if (process.stdout && process.stdout.on) {
@@ -111,7 +114,10 @@ class Shell {
       for (let i = 0; i < this.interruptSignalListener.length; i++) {
         this.interruptSignalListener[i]();
       }
-      this.nimbus.publish("SYSTEM", { targetShellId: this.id, message: "SIGINT" });
+      this.nimbus.publish("SYSTEM", {
+        targetShellId: this.id,
+        message: "SIGINT",
+      });
       this.crt.write("^C\n");
       this.showPrompt();
       this.termUtil.showCursor();
@@ -190,9 +196,14 @@ class Shell {
       let fullPath = null;
       // PATCH: handle ~ as home dir
       if (cmdName.startsWith("~")) {
-        let userHome = isWin ? nosPath("home") : "/home/";// + this.username;
+        let userHome = isWin ? nosPath("home") : "/home/"; // + this.username;
         let relPath = cmdName.slice(1);
-        let homePath = relPath ? this.#nos.path.resolve(userHome, relPath.startsWith("/") ? relPath.slice(1) : relPath) : userHome;
+        let homePath = relPath
+          ? this.#nos.path.resolve(
+              userHome,
+              relPath.startsWith("/") ? relPath.slice(1) : relPath
+            )
+          : userHome;
         let homeFile = homePath.endsWith(".js") ? homePath : homePath + ".js";
         if (fs.existsSync(homeFile)) {
           fullPath = homeFile;
@@ -219,10 +230,10 @@ class Shell {
       let errorLevel = await this.#nos.executeModule(
         directory,
         baseFileName,
-        () => { },
+        () => {},
         this,
         this.rootActive,
-        lastCmd,
+        lastCmd
       );
     } catch (e) {
       if (e.code == 1 || e.code == 2 || e.code == 3) {
@@ -252,7 +263,8 @@ class Shell {
     this.#nos.shutdown(1);
   }
 
-  terminate() {
+  terminate(requestShowprompt = true) {
+    this.requestShowprompt = requestShowprompt;
     this.showPrompt();
   }
 
@@ -272,13 +284,14 @@ class Shell {
   };
 
   showPrompt() {
+    if (this.requestShowprompt === false) return;
     if (this.promptVisible === true) {
       let str = this.prompt;
       str = str.replaceAll(
         "%pwd",
         this.pwd.length > 1 && this.pwd.endsWith("/") === true
           ? this.pwd.substring(0, this.pwd.length - 1)
-          : this.pwd,
+          : this.pwd
       );
       str = str.replaceAll("%username", this.username);
       str = str.replaceAll("%hostname", this.#nos.hostName);
@@ -349,9 +362,9 @@ class Shell {
                 } else {
                   reject(false);
                 }
-              },
+              }
             );
-          },
+          }
         );
       } else {
         new userPrompt(
@@ -372,7 +385,7 @@ class Shell {
             } else {
               reject(false);
             }
-          },
+          }
         );
       }
     });
@@ -459,7 +472,9 @@ class Shell {
     }
     const directories = paths.split(";");
     for (const dir of directories) {
-      const fullPath = isWin ? nosPath(dir, fileName) : path.resolve(dir, fileName);
+      const fullPath = isWin
+        ? nosPath(dir, fileName)
+        : path.resolve(dir, fileName);
       if (fs.existsSync(fullPath)) {
         return fullPath;
       }
@@ -542,7 +557,6 @@ class Shell {
     return result;
   }
 }
-
 
 // const p1 = new userPrompt({
 //   prompt: "blabla",

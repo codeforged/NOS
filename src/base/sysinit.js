@@ -3,7 +3,7 @@ module.exports = {
   main: async function (nos) {
     __APP.distro = {
       sysinitVersion: "1.23",
-      version: "Ficus Elastica v1.24",
+      version: "Ficus Elastica v1.26",
     };
     // return;
     const path = require("path");
@@ -32,7 +32,6 @@ module.exports = {
     } else {
       nos.hostName = nos.sysConfig.hostName || os.hostname();
     }
-
 
     const __nimbusDriver = bfs.require("/dev/nimbus.js");
     const nimbusDriver = new __nimbusDriver.NOSInternalMessageBus();
@@ -216,7 +215,10 @@ module.exports = {
         banner = banner.replaceAll("${OSType}", os.type());
         banner = banner.replaceAll("${OSPlatform}", os.platform());
         banner = banner.replaceAll("${OSRelease}", os.release());
-        banner = banner.replaceAll("${RAMInfo}", Math.round(os.totalmem() / 1024 / 1024));
+        banner = banner.replaceAll(
+          "${RAMInfo}",
+          Math.round(os.totalmem() / 1024 / 1024)
+        );
 
         // console.log("OS Type:", os.type());           // Misal: 'Linux', 'Darwin', 'Windows_NT'
         // console.log("OS Platform:", os.platform());   // Misal: 'linux', 'win32'

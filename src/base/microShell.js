@@ -13,7 +13,7 @@ class CustomShell extends basicShell.Shell {
     super(prompt, title, nos, transmitData, authentication);
     this.#nos = nos;
     this._pipeContextStack = []; // Stack untuk buffer & transmit context
-    this.version = "microShell 0.081";
+    this.version = "microShell 0.082";
   }
 
   async shellHandler(lastCmd, isFromPipe = false) {
@@ -173,9 +173,9 @@ class CustomShell extends basicShell.Shell {
       }
       this.crt.write(inputData);
       this.promptVisible = true;
-      // setTimeout(() => {
-      //   this.showPrompt();
-      // }, 250);
+      setTimeout(() => {
+        this.showPrompt();
+      }, 250);
 
       return;
     }

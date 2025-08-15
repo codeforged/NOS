@@ -1,7 +1,7 @@
 module.exports = {
   name: "less",
   description: "View text page by page with scroll and pipe support",
-  version: "1.4",
+  version: "1.5",
   needRoot: false,
   main: function (nos) {
     this.display = this.shell.crt;
@@ -10,18 +10,18 @@ module.exports = {
     const path = this.shell.pathLib;
 
     const resolvePathHelper = (rawPath) => {
-      const homeDirectory = this.shell.home || '/home';
+      const homeDirectory = this.shell.home || "/home";
       const currentWorkingDirectory = this.shell.pwd;
 
-      if (rawPath === '~') rawPath = '~/'
-      else if (rawPath === '.') rawPath = './'
+      if (rawPath === "~") rawPath = "~/";
+      else if (rawPath === ".") rawPath = "./";
 
-      if (rawPath.startsWith('~/')) {
+      if (rawPath.startsWith("~/")) {
         return path.posix.join(homeDirectory, rawPath.substring(2));
-      } else if (rawPath.startsWith('./')) {
+      } else if (rawPath.startsWith("./")) {
         return path.posix.join(currentWorkingDirectory, rawPath.substring(2));
-      } else if (rawPath.startsWith('/')) {
-        return rawPath; // Absolute path  
+      } else if (rawPath.startsWith("/")) {
+        return rawPath; // Absolute path
       } else {
         // Relative to current working directory
         return path.posix.join(currentWorkingDirectory, rawPath);
@@ -115,7 +115,10 @@ module.exports = {
             this.display.write(contentLines[currentLine + i] + "\n");
         }
         currentLine += PAGE_SIZE;
-      } else if ((key.name.toLowerCase() === "q") || (key.name == "\x03" && key.ctrl === true)) {
+      } else if (
+        key.name.toLowerCase() === "q" ||
+        (key.name == "\x03" && key.ctrl === true)
+      ) {
         this.display.clear();
         showCursor();
         this.shell.keyboardActive = true;
@@ -155,6 +158,7 @@ module.exports = {
     };
 
     loadContent();
+    this.shell.terminate(false);
 
     this.shell.interruptSignalListener.push(() => {
       this.shell.keyboardActive = true;
